@@ -1,0 +1,78 @@
+package com.dustinmreed.openwifi;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+public class MainActivityAdapter extends CursorAdapter {
+
+    private static final int VIEW_TYPE_COUNT = 2;
+    private static final int VIEW_TYPE_TODAY = 0;
+    private static final int VIEW_TYPE_FUTURE_DAY = 1;
+
+    // Flag to determine if we want to use a separate view for "today".
+    private boolean mUseTodayLayout = true;
+
+    public MainActivityAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
+    }
+
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        // Choose the layout type
+        int viewType = getItemViewType(cursor.getPosition());
+        int layoutId = -1;
+        switch (viewType) {
+            case VIEW_TYPE_TODAY: {
+                layoutId = R.layout.list_item_wifi_location;
+                break;
+            }
+            case VIEW_TYPE_FUTURE_DAY: {
+                layoutId = R.layout.list_item_wifi_location;
+                break;
+            }
+        }
+
+        View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
+
+        return view;
+    }
+
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
+        String siteName = cursor.getString(MainActivityFragment.COL_WIFILOCATION_NAME);
+        viewHolder.infoView.setText(siteName);
+    }
+
+    public void setUseTodayLayout(boolean useTodayLayout) {
+        mUseTodayLayout = useTodayLayout;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return (position == 0 && mUseTodayLayout) ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return VIEW_TYPE_COUNT;
+    }
+
+    public static class ViewHolder {
+        public final TextView infoView;
+
+
+        public ViewHolder(View view) {
+            infoView = (TextView) view.findViewById(R.id.list_item_wifi_textview);
+        }
+    }
+}
