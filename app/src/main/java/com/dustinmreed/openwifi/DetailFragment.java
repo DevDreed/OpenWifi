@@ -49,7 +49,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static final String FORECAST_SHARE_HASHTAG = " #OpenWiFIApp";
     private static final int DETAIL_LOADER = 0;
     private static final String[] DETAIL_COLUMNS = {
-            WiFiLocationEntry.TABLE_NAME + "." + WiFiLocationEntry._ID,
+            WiFiLocationEntry.TABLE_NAME,
             WiFiLocationEntry.COLUMN_SITE_NAME,
             WiFiLocationEntry.COLUMN_SITE_TYPE,
             WiFiLocationEntry.COLUMN_STREET_ADDRESS,
@@ -75,7 +75,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        mSiteNameView = (TextView) rootView.findViewById(R.id.detail_date_textview);
+        mSiteNameView = (TextView) rootView.findViewById(R.id.detail_name_textview);
         return rootView;
     }
 

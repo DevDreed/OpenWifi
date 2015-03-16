@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.dustinmreed.openwifi.data.WifiLocationContract;
@@ -83,24 +84,22 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // Get a reference to the ListView, and attach this adapter to it.
         mListView = (ListView) rootView.findViewById(R.id.listview_wifi_location);
         mListView.setAdapter(mWiFiLocationAdapter);
-        // We'll call our MainActivity
-//       mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//                // CursorAdapter returns a cursor at the correct position for getItem(), or null
-//                // if it cannot seek to that position.
-//                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-//                if (cursor != null) {
-//                    String locationSetting = Utility.getPreferredLocation(getActivity());
-//                    ((Callback) getActivity())
-//                            .onItemSelected(WifiLocationContract.WiFiLocationEntry.buildWeatherLocationWithDate(
-//                                    locationSetting, cursor.getLong(COL_WIFILOCATION_DATE)
-//                            ));
-//                }
-//                mPosition = position;
-//            }
-//        });
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+
+                    ((Callback) getActivity())
+                            .onItemSelected(WifiLocationContract.WiFiLocationEntry.buildWiFiLocation());
+                }
+                mPosition = position;
+            }
+        });
 
         // If there's instance state, mine it for useful information.
         // The end-goal here is that the user never knows that turning their device sideways
