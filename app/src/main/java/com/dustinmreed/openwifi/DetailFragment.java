@@ -42,9 +42,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_ID = 0;
     static final int COL_WIFILOCATION_NAME = 1;
     static final int COL_WIFILOCATION_TYPE = 2;
-    static final int COL_WIFILOCATION_ADDRESS = 3;
+    static final int COL_WIFILOCATION_STREET_ADDRESS = 3;
     static final int COL_WIFILOCATION_LAT = 4;
     static final int COL_WIFILOCATION_LONG = 5;
+    static final int COL_WIFILOCATION_ADDRESS = 6;
+    static final int COL_WIFILOCATION_CITY = 7;
+    static final int COL_WIFILOCATION_STATE = 8;
+    static final int COL_WIFILOCATION_ZIPCODE = 9;
     static final String DETAIL_URI = "URI";
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     private static final String FORECAST_SHARE_HASHTAG = " #OpenWiFIApp";
@@ -56,11 +60,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             WiFiLocationEntry.COLUMN_STREET_ADDRESS,
             WiFiLocationEntry.COLUMN_COORD_LAT,
             WiFiLocationEntry.COLUMN_COORD_LONG,
+            WiFiLocationEntry.COLUMN_ADDRESS,
+            WiFiLocationEntry.COLUMN_CITY,
+            WiFiLocationEntry.COLUMN_STATE,
+            WiFiLocationEntry.COLUMN_ZIPCODE,
     };
     private ShareActionProvider mShareActionProvider;
     private String mWiFiLocation;
     private Uri mUri;
     private TextView mSiteNameView;
+    private TextView mSiteAddressView;
+    private TextView mSiteCityView;
+    private TextView mSiteStateView;
+    private TextView mSiteZipcodeView;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -77,6 +89,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         mSiteNameView = (TextView) rootView.findViewById(R.id.detail_name_textview);
+        mSiteAddressView = (TextView) rootView.findViewById(R.id.detail_address_textview);
+        mSiteCityView = (TextView) rootView.findViewById(R.id.detail_city_textview);
+        mSiteStateView = (TextView) rootView.findViewById(R.id.detail_state_textview);
+        mSiteZipcodeView = (TextView) rootView.findViewById(R.id.detail_zipcode_textview);
         return rootView;
     }
 
@@ -134,7 +150,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             String siteName = data.getString(COL_WIFILOCATION_NAME);
             mSiteNameView.setText(siteName);
-
+            String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
+            mSiteAddressView.setText(siteAddress);
+            String siteCity = data.getString(COL_WIFILOCATION_CITY);
+            mSiteCityView.setText(siteCity);
+            String siteState = data.getString(COL_WIFILOCATION_STATE);
+            mSiteStateView.setText(siteState);
+            String siteZipcode = data.getString(COL_WIFILOCATION_ZIPCODE);
+            mSiteZipcodeView.setText(siteZipcode);
 
             // We still need this for the share intent
             mWiFiLocation = String.format("%s", siteName);

@@ -38,6 +38,10 @@ public class WifiLocationContract {
         public static final String COLUMN_STREET_ADDRESS = "street_address";
         public static final String COLUMN_COORD_LAT = "coord_lat";
         public static final String COLUMN_COORD_LONG = "coord_long";
+        public static final String COLUMN_ADDRESS = "address";
+        public static final String COLUMN_CITY = "city";
+        public static final String COLUMN_STATE = "state";
+        public static final String COLUMN_ZIPCODE = "zipcode";
 
         public static Uri buildWiFiLocationUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

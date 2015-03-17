@@ -33,6 +33,10 @@ public class WifiLocationDbHelper extends SQLiteOpenHelper {
                 WiFiLocationEntry.COLUMN_STREET_ADDRESS + " TEXT NOT NULL, " +
                 WiFiLocationEntry.COLUMN_COORD_LAT + " TEXT NOT NULL, " +
                 WiFiLocationEntry.COLUMN_COORD_LONG + " TEXT NOT NULL, " +
+                WiFiLocationEntry.COLUMN_ADDRESS + " TEXT NOT NULL, " +
+                WiFiLocationEntry.COLUMN_CITY + " TEXT NOT NULL, " +
+                WiFiLocationEntry.COLUMN_STATE + " TEXT NOT NULL, " +
+                WiFiLocationEntry.COLUMN_ZIPCODE + " TEXT NOT NULL, " +
 
                 " UNIQUE (" + WiFiLocationEntry.COLUMN_SITE_NAME +
                 ") ON CONFLICT REPLACE);";

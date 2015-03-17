@@ -32,7 +32,7 @@ import java.util.Vector;
 public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
-    public static final int SYNC_INTERVAL = 60 * 1;
+    public static final int SYNC_INTERVAL = 60 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 
@@ -181,8 +181,12 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
         final String WIFIDATA_LAT = "latitude";
         final String WIFIDATA_HUMANADDRESS = "human_address";
         final String WIFIDATA_TYPE = "site_type";
-        final String WIFIDATA_ADDRESS = "street_address";
+        final String WIFIDATA_STREET_ADDRESS = "street_address";
         final String WIFIDATA_NAME = "site_name";
+        final String WIFIDATA_ADDRESS = "address";
+        final String WIFIDATA_CITY = "city";
+        final String WIFIDATA_STATE = "state";
+        final String WIFIDATA_ZIPCODE = "zip";
 
         try {
             JSONArray jArray = new JSONArray(wifiJsonStr);
@@ -192,26 +196,40 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
             for (int i = 0; i < jArray.length(); i++) {
                 String name;
                 String type;
-                String address;
+                String street_address;
                 String longitude;
                 String latitude;
+                String address;
+                String city;
+                String state;
+                String zipcode;
 
                 JSONObject wifiLocation = jArray.getJSONObject(i);
                 JSONObject mappedLocation = wifiLocation.getJSONObject(WIFIDATA_MAPPEDLOCTION);
+                JSONObject humanAddress = new JSONObject(mappedLocation.getString(WIFIDATA_HUMANADDRESS));
 
                 name = wifiLocation.getString(WIFIDATA_NAME);
                 type = wifiLocation.getString(WIFIDATA_TYPE);
-                address = wifiLocation.getString(WIFIDATA_ADDRESS);
+                street_address = wifiLocation.getString(WIFIDATA_STREET_ADDRESS);
                 longitude = mappedLocation.getString(WIFIDATA_LONG);
                 latitude = mappedLocation.getString(WIFIDATA_LAT);
+                address = humanAddress.getString(WIFIDATA_ADDRESS);
+                city = humanAddress.getString(WIFIDATA_CITY);
+                state = humanAddress.getString(WIFIDATA_STATE);
+                zipcode = humanAddress.getString(WIFIDATA_ZIPCODE);
+
 
                 ContentValues wifiLocationValues = new ContentValues();
 
                 wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_NAME, name);
                 wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_TYPE, type);
-                wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_STREET_ADDRESS, address);
+                wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_STREET_ADDRESS, street_address);
                 wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_COORD_LONG, longitude);
                 wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_COORD_LAT, latitude);
+                wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_ADDRESS, address);
+                wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_CITY, city);
+                wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_STATE, state);
+                wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_ZIPCODE, zipcode);
 
                 cVVector.add(wifiLocationValues);
             }
