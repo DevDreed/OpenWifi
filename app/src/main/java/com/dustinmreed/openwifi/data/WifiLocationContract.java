@@ -19,7 +19,6 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.text.format.Time;
 
 public class WifiLocationContract {
 
@@ -27,21 +26,13 @@ public class WifiLocationContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_WIFILOCATION = "wifilocation";
 
-    public static long normalizeDate(long startDate) {
-        Time time = new Time();
-        time.set(startDate);
-        int julianDay = Time.getJulianDay(startDate, time.gmtoff);
-        return time.setJulianDay(julianDay);
-    }
-
     public static final class WiFiLocationEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_WIFILOCATION).build();
 
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_WIFILOCATION;
-        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_WIFILOCATION;
         public static final String TABLE_NAME = "wifilocation";
-        public static final String COLUMN_LOC_KEY = "location_id";
+        public static final String COLUMN_ID = "_id";
         public static final String COLUMN_SITE_NAME = "site_name";
         public static final String COLUMN_SITE_TYPE = "site_type";
         public static final String COLUMN_STREET_ADDRESS = "street_address";
@@ -57,6 +48,14 @@ public class WifiLocationContract {
          */
         public static Uri buildWiFiLocation() {
             return CONTENT_URI.buildUpon().build();
+        }
+
+        public static Uri buildWiFiLocationWithName(String nameSetting) {
+            return CONTENT_URI.buildUpon().appendPath(nameSetting).build();
+        }
+
+        public static String getNameSettingFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 }

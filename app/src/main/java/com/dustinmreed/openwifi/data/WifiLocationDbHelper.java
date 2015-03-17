@@ -28,12 +28,14 @@ public class WifiLocationDbHelper extends SQLiteOpenHelper {
                 // for a certain date and all dates *following*, so the forecast data
                 // should be sorted accordingly.
                 WiFiLocationEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                WiFiLocationEntry.COLUMN_SITE_NAME + " INTEGER NOT NULL, " +
+                WiFiLocationEntry.COLUMN_SITE_NAME + " TEXT NOT NULL, " +
                 WiFiLocationEntry.COLUMN_SITE_TYPE + " TEXT NOT NULL, " +
-                WiFiLocationEntry.COLUMN_STREET_ADDRESS + " REAL NOT NULL, " +
-                WiFiLocationEntry.COLUMN_COORD_LAT + " REAL NOT NULL, " +
-                WiFiLocationEntry.COLUMN_COORD_LONG + " REAL NOT NULL, " +
-                WiFiLocationEntry.COLUMN_SITE_TYPE + ") ON CONFLICT REPLACE);";
+                WiFiLocationEntry.COLUMN_STREET_ADDRESS + " TEXT NOT NULL, " +
+                WiFiLocationEntry.COLUMN_COORD_LAT + " TEXT NOT NULL, " +
+                WiFiLocationEntry.COLUMN_COORD_LONG + " TEXT NOT NULL, " +
+
+                " UNIQUE (" + WiFiLocationEntry.COLUMN_SITE_NAME +
+                ") ON CONFLICT REPLACE);";
 
         sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE);
     }

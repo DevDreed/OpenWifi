@@ -66,10 +66,8 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
     protected void onResume() {
         super.onResume();
         MainActivityFragment ff = (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-        if (null != ff) {
-            ff.onLocationChanged();
-        }
         DetailFragment df = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
+
     }
 
     @Override

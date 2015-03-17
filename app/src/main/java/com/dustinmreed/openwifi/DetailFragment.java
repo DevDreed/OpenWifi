@@ -39,17 +39,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     // These indices are tied to DETAIL_COLUMNS.  If DETAIL_COLUMNS changes, these
     // must change.
-    static final int COL_WIFILOCATION_NAME = 0;
-    static final int COL_WIFILOCATION_TYPE = 1;
-    static final int COL_WIFILOCATION_ADDRESS = 2;
-    static final int COL_WIFILOCATION_LAT = 3;
-    static final int COL_WIFILOCATION_LONG = 4;
+    static final int COL_ID = 0;
+    static final int COL_WIFILOCATION_NAME = 1;
+    static final int COL_WIFILOCATION_TYPE = 2;
+    static final int COL_WIFILOCATION_ADDRESS = 3;
+    static final int COL_WIFILOCATION_LAT = 4;
+    static final int COL_WIFILOCATION_LONG = 5;
     static final String DETAIL_URI = "URI";
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     private static final String FORECAST_SHARE_HASHTAG = " #OpenWiFIApp";
     private static final int DETAIL_LOADER = 0;
     private static final String[] DETAIL_COLUMNS = {
-            WiFiLocationEntry.TABLE_NAME,
+            WiFiLocationEntry._ID,
             WiFiLocationEntry.COLUMN_SITE_NAME,
             WiFiLocationEntry.COLUMN_SITE_TYPE,
             WiFiLocationEntry.COLUMN_STREET_ADDRESS,
@@ -136,7 +137,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
 
             // We still need this for the share intent
-            mWiFiLocation = String.format("%s - %s - %s/%s", siteName);
+            mWiFiLocation = String.format("%s", siteName);
 
             // If onCreateOptionsMenu has already happened, we need to update the share intent now.
             if (mShareActionProvider != null) {

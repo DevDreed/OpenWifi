@@ -27,16 +27,18 @@ import android.net.Uri;
 public class WifiLocationProvider extends ContentProvider {
 
     static final int WIFILOCATION = 100;
+    static final int WIFILOCATION_WITH_NAME = 101;
     private static final UriMatcher sUriMatcher = buildUriMatcher();
-    private static final SQLiteQueryBuilder sWeatherByLocationSettingQueryBuilder;
+    private static final SQLiteQueryBuilder sWiFiLocationByNameSettingQueryBuilder;
+    private static final String sLocationSettingSelection =
+            WifiLocationContract.WiFiLocationEntry.TABLE_NAME +
+                    "." + WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_NAME + " = ? ";
 
     static {
-        sWeatherByLocationSettingQueryBuilder = new SQLiteQueryBuilder();
+        sWiFiLocationByNameSettingQueryBuilder = new SQLiteQueryBuilder();
 
-        sWeatherByLocationSettingQueryBuilder.setTables(
-                WifiLocationContract.WiFiLocationEntry.TABLE_NAME +
-                        " ON " + WifiLocationContract.WiFiLocationEntry.TABLE_NAME +
-                        "." + WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_NAME);
+        sWiFiLocationByNameSettingQueryBuilder.setTables(
+                WifiLocationContract.WiFiLocationEntry.TABLE_NAME);
     }
 
     private WifiLocationDbHelper mOpenHelper;
@@ -48,7 +50,29 @@ public class WifiLocationProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, WifiLocationContract.PATH_WIFILOCATION, WIFILOCATION);
+        matcher.addURI(authority, WifiLocationContract.PATH_WIFILOCATION + "/*", WIFILOCATION_WITH_NAME);
         return matcher;
+    }
+
+    private Cursor getWifiLocationByNameSetting(Uri uri, String[] projection, String sortOrder) {
+        String nameSetting = WifiLocationContract.WiFiLocationEntry.getNameSettingFromUri(uri);
+
+        String[] selectionArgs;
+        String selection;
+
+
+        selection = sLocationSettingSelection;
+        selectionArgs = new String[]{nameSetting};
+
+
+        return sWiFiLocationByNameSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
     }
 
     @Override
@@ -66,6 +90,8 @@ public class WifiLocationProvider extends ContentProvider {
         switch (match) {
             case WIFILOCATION:
                 return WifiLocationContract.WiFiLocationEntry.CONTENT_TYPE;
+            case WIFILOCATION_WITH_NAME:
+                return WifiLocationContract.WiFiLocationEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -78,7 +104,6 @@ public class WifiLocationProvider extends ContentProvider {
         // and query the database accordingly.
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
-            // "weather"
             case WIFILOCATION: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         WifiLocationContract.WiFiLocationEntry.TABLE_NAME,
@@ -89,6 +114,11 @@ public class WifiLocationProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
+                break;
+            }
+            // "weather/*"
+            case WIFILOCATION_WITH_NAME: {
+                retCursor = getWifiLocationByNameSetting(uri, projection, sortOrder);
                 break;
             }
             default:

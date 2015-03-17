@@ -28,6 +28,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     // These indices are tied to WIFILOCATION_COLUMNS.  If WIFILOCATION_COLUMNS changes, these
     // must change.
+    static final int _ID = 0;
     static final int COL_WIFILOCATION_NAME = 1;
     static final int COL_WIFILOCATION_TYPE = 2;
     static final int COL_WIFILOCATION_ADDRESS = 3;
@@ -93,9 +94,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 if (cursor != null) {
-
                     ((Callback) getActivity())
-                            .onItemSelected(WifiLocationContract.WiFiLocationEntry.buildWiFiLocation());
+                            .onItemSelected(WifiLocationContract.WiFiLocationEntry.buildWiFiLocationWithName(cursor.getString(COL_WIFILOCATION_NAME)
+                            ));
                 }
                 mPosition = position;
             }
@@ -168,7 +169,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        String locationSetting = "";
         Uri weatherForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocation();
 
         return new CursorLoader(getActivity(),
