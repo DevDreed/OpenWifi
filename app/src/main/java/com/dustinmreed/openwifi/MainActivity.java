@@ -12,6 +12,7 @@ import com.dustinmreed.openwifi.sync.OpenWiFiSyncAdapter;
 public class MainActivity extends ActionBarActivity implements MainActivityFragment.Callback {
 
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
+    private static final String MAPFRAGMENT_TAG = "DMAPTAG";
     private final String LOG_TAG = MainActivity.class.getSimpleName();
     private boolean mTwoPane;
 
@@ -20,11 +21,11 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        if (findViewById(R.id.wifilocation_detail_container) != null) {
+        if (findViewById(R.id.wifilocation_map_container) != null) {
             mTwoPane = true;
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.wifilocation_detail_container, new DetailFragment(), DETAILFRAGMENT_TAG)
+                        .replace(R.id.wifilocation_map_container, new MapFragment(), MAPFRAGMENT_TAG)
                         .commit();
             }
         } else {
@@ -48,16 +49,8 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            startActivity(new Intent(this, SettingsActivity.class));
-//            return true;
-//        }
+        int id = item.getItemId();
 
         return super.onOptionsItemSelected(item);
     }
@@ -66,27 +59,26 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
     protected void onResume() {
         super.onResume();
         MainActivityFragment ff = (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-        DetailFragment df = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
+        MapFragment mf = (MapFragment) getSupportFragmentManager().findFragmentByTag(MAPFRAGMENT_TAG);
 
     }
 
     @Override
     public void onItemSelected(Uri contentUri) {
         if (mTwoPane) {
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
             Bundle args = new Bundle();
             args.putParcelable(DetailFragment.DETAIL_URI, contentUri);
 
-            DetailFragment fragment = new DetailFragment();
+            MapFragment fragment = new MapFragment();
             fragment.setArguments(args);
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.wifilocation_detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .replace(R.id.wifilocation_map_container, fragment, MAPFRAGMENT_TAG)
                     .commit();
         } else {
-            Intent intent = new Intent(this, DetailActivity.class)
+
+            Intent intent = new Intent(this, MapActivity.class)
+                    //Intent intent = new Intent(this, DetailActivity.class)
                     .setData(contentUri);
             startActivity(intent);
         }
