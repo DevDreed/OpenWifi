@@ -77,8 +77,7 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
                     .commit();
         } else {
 
-            Intent intent = new Intent(this, MapActivity.class)
-                    //Intent intent = new Intent(this, DetailActivity.class)
+            Intent intent = new Intent(this, DetailActivity.class)
                     .setData(contentUri);
             startActivity(intent);
         }

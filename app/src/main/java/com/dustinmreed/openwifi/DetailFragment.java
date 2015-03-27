@@ -34,6 +34,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.dustinmreed.openwifi.data.WifiLocationContract.WiFiLocationEntry;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -65,6 +71,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             WiFiLocationEntry.COLUMN_STATE,
             WiFiLocationEntry.COLUMN_ZIPCODE,
     };
+    MapView mapView;
+    GoogleMap map;
     private ShareActionProvider mShareActionProvider;
     private String mWiFiLocation;
     private Uri mUri;
@@ -73,6 +81,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mSiteCityView;
     private TextView mSiteStateView;
     private TextView mSiteZipcodeView;
+    private Double latitude;
+    private Double longitude;
+    private String siteName;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -93,6 +104,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mSiteCityView = (TextView) rootView.findViewById(R.id.detail_city_textview);
         mSiteStateView = (TextView) rootView.findViewById(R.id.detail_state_textview);
         mSiteZipcodeView = (TextView) rootView.findViewById(R.id.detail_zipcode_textview);
+
+        // Gets the MapView from the XML layout and creates it
+        mapView = (MapView) rootView.findViewById(R.id.mapview);
+        mapView.onCreate(savedInstanceState);
+
         return rootView;
     }
 
@@ -148,7 +164,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
 
-            String siteName = data.getString(COL_WIFILOCATION_NAME);
+            siteName = data.getString(COL_WIFILOCATION_NAME);
             mSiteNameView.setText(siteName);
             String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
             mSiteAddressView.setText(siteAddress);
@@ -158,6 +174,33 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mSiteStateView.setText(siteState);
             String siteZipcode = data.getString(COL_WIFILOCATION_ZIPCODE);
             mSiteZipcodeView.setText(siteZipcode);
+
+            latitude = Double.valueOf(data.getString(COL_WIFILOCATION_LAT));
+            longitude = Double.valueOf(data.getString(COL_WIFILOCATION_LONG));
+
+
+            // Gets to GoogleMap from the MapView and does initialization stuff
+            map = mapView.getMap();
+            map.getUiSettings().setMyLocationButtonEnabled(false);
+            map.setMyLocationEnabled(true);
+
+            map.addMarker(new MarkerOptions()
+                    .position(new LatLng(latitude, longitude))
+                    .snippet(siteAddress)
+                    .title(siteName));
+
+            // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
+            MapsInitializer.initialize(this.getActivity());
+
+
+            // Updates the location and zoom of the MapView
+            //CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(36.05590917600006, -86.67243400799998), 20);
+            // Move the camera instantly to location with a zoom of 15.
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15));
+
+            // Zoom in, animating the camera.
+            map.animateCamera(CameraUpdateFactory.zoomTo(14));
+            //map.animateCamera(cameraUpdate);
 
             // We still need this for the share intent
             mWiFiLocation = String.format("%s", siteName);
@@ -171,5 +214,23 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    @Override
+    public void onResume() {
+        mapView.onResume();
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
     }
 }
