@@ -1,28 +1,37 @@
 <!-- Master layout. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapview"
-        android:layout_width="match_parent"
-        android:layout_height="180dp" />
-
-    <ScrollView
-
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:gravity="center_vertical"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="358dp"
+        android:orientation="vertical">
 
-        <!-- Header: Day, Date -->
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/route_nav_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="-32dp"
+            fab:fab_colorNormal="@color/pink"
+            fab:fab_colorPressed="@color/pink_pressed"
+            fab:fab_icon="@drawable/ic_directions_white" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layout_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
         <TextView
             android:id="@+id/detail_name_textview"
             android:layout_width="match_parent"
@@ -63,5 +72,10 @@
             android:textColor="@color/black"
             android:textSize="24sp" />
     </LinearLayout>
-</ScrollView>
-</LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="left|bottom"></RelativeLayout>
+</FrameLayout>
+

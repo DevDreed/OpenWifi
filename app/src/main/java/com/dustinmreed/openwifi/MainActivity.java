@@ -21,11 +21,11 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        if (findViewById(R.id.wifilocation_map_container) != null) {
+        if (findViewById(R.id.wifilocation_detail_container) != null) {
             mTwoPane = true;
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.wifilocation_map_container, new MapFragment(), MAPFRAGMENT_TAG)
+                        .replace(R.id.wifilocation_detail_container, new DetailFragment(), DETAILFRAGMENT_TAG)
                         .commit();
             }
         } else {
@@ -58,9 +58,6 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
     @Override
     protected void onResume() {
         super.onResume();
-        MainActivityFragment ff = (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-        MapFragment mf = (MapFragment) getSupportFragmentManager().findFragmentByTag(MAPFRAGMENT_TAG);
-
     }
 
     @Override
@@ -69,11 +66,11 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
             Bundle args = new Bundle();
             args.putParcelable(DetailFragment.DETAIL_URI, contentUri);
 
-            MapFragment fragment = new MapFragment();
+            DetailFragment fragment = new DetailFragment();
             fragment.setArguments(args);
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.wifilocation_map_container, fragment, MAPFRAGMENT_TAG)
+                    .replace(R.id.wifilocation_detail_container, fragment, DETAILFRAGMENT_TAG)
                     .commit();
         } else {
 

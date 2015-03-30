@@ -41,14 +41,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.dustinmreed.openwifi.MainActivity" />
         </activity>
-        <activity
-            android:name=".MapActivity"
-            android:label="@string/title_activity_detail"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dustinmreed.openwifi.MainActivity" />
-        </activity>
 
         <provider
             android:name=".data.WifiLocationProvider"

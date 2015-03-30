@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.dustinmreed.openwifi.data.WifiLocationContract.WiFiLocationEntry;
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -81,6 +82,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mSiteCityView;
     private TextView mSiteStateView;
     private TextView mSiteZipcodeView;
+    private FloatingActionButton favNavigation;
+
     private Double latitude;
     private Double longitude;
     private String siteName;
@@ -108,6 +111,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         // Gets the MapView from the XML layout and creates it
         mapView = (MapView) rootView.findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
+
+        favNavigation = (FloatingActionButton) rootView.findViewById(R.id.route_nav_icon);
+        favNavigation.setSize(FloatingActionButton.SIZE_NORMAL);
+        favNavigation.setColorNormalResId(R.color.pink);
+        favNavigation.setColorPressedResId(R.color.pink_pressed);
+        favNavigation.setIcon(R.drawable.ic_directions_white);
+        favNavigation.setStrokeVisible(false);
 
         return rootView;
     }
@@ -166,9 +176,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             siteName = data.getString(COL_WIFILOCATION_NAME);
             mSiteNameView.setText(siteName);
-            String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
+            final String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
             mSiteAddressView.setText(siteAddress);
-            String siteCity = data.getString(COL_WIFILOCATION_CITY);
+            final String siteCity = data.getString(COL_WIFILOCATION_CITY);
             mSiteCityView.setText(siteCity);
             String siteState = data.getString(COL_WIFILOCATION_STATE);
             mSiteStateView.setText(siteState);
@@ -177,6 +187,20 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             latitude = Double.valueOf(data.getString(COL_WIFILOCATION_LAT));
             longitude = Double.valueOf(data.getString(COL_WIFILOCATION_LONG));
+
+            favNavigation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Uri gmmIntentUri = Uri.parse("geo:" + latitude + ", " + longitude)
+                            .buildUpon()
+                            .appendQueryParameter("q", siteAddress + ", " + siteCity)
+                            .build();
+//                    Uri gmmIntentUri = Uri.parse("google.navigation:q=Taronga+Zoo,+Sydney+Australia");
+                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                    mapIntent.setPackage("com.google.android.apps.maps");
+                    startActivity(mapIntent);
+                }
+            });
 
 
             // Gets to GoogleMap from the MapView and does initialization stuff
@@ -220,6 +244,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onResume() {
         mapView.onResume();
         super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        map.setMyLocationEnabled(false);
     }
 
     @Override
