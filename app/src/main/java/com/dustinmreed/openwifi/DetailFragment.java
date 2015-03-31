@@ -24,6 +24,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -114,10 +115,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         favNavigation = (FloatingActionButton) rootView.findViewById(R.id.route_nav_icon);
         favNavigation.setSize(FloatingActionButton.SIZE_NORMAL);
-        favNavigation.setColorNormalResId(R.color.pink);
-        favNavigation.setColorPressedResId(R.color.pink_pressed);
+        favNavigation.setColorNormalResId(R.color.blue);
+        favNavigation.setColorPressedResId(R.color.blue_pressed);
         favNavigation.setIcon(R.drawable.ic_directions_white);
         favNavigation.setStrokeVisible(false);
+        ViewCompat.setElevation(favNavigation, 1);
 
         return rootView;
     }
@@ -249,7 +251,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onPause() {
         super.onPause();
-        map.setMyLocationEnabled(false);
     }
 
     @Override
