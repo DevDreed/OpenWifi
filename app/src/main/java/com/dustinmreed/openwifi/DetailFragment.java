@@ -115,7 +115,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         favNavigation = (FloatingActionButton) rootView.findViewById(R.id.route_nav_icon);
         favNavigation.setSize(FloatingActionButton.SIZE_NORMAL);
-        favNavigation.setColorNormalResId(R.color.blue);
+        favNavigation.setColorNormalResId(R.color.accentColor);
         favNavigation.setColorPressedResId(R.color.blue_pressed);
         favNavigation.setIcon(R.drawable.ic_directions_white);
         favNavigation.setStrokeVisible(false);
@@ -208,8 +208,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             // Gets to GoogleMap from the MapView and does initialization stuff
             map = mapView.getMap();
             map.getUiSettings().setMyLocationButtonEnabled(false);
-            map.setMyLocationEnabled(true);
-
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(latitude, longitude))
                     .snippet(siteAddress)
