@@ -43,7 +43,6 @@ public class NavigationDrawerFragment extends Fragment {
 
     public static String readFromPreferences(Context context, String preferenceName, String defaultValue) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
         return sharedPreferences.getString(preferenceName, defaultValue);
     }
 
