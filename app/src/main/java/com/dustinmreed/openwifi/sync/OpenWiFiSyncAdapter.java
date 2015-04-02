@@ -32,9 +32,8 @@ import java.util.Vector;
 public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
-    public static final int SYNC_INTERVAL = 60 * 180;
+    public static final int SYNC_INTERVAL = 60 * 1440;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
-    private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 
     public final String LOG_TAG = OpenWiFiSyncAdapter.class.getSimpleName();
 
@@ -46,7 +45,6 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
         Account account = getSyncAccount(context);
         String authority = context.getString(R.string.content_authority);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            // we can enable inexact timers in our periodic sync
             SyncRequest request = new SyncRequest.Builder().
                     syncPeriodic(syncInterval, flexTime).
                     setSyncAdapter(account, authority).
@@ -58,11 +56,6 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    /**
-     * Helper method to have the sync adapter sync immediately
-     *
-     * @param context The context used to access the account service
-     */
     public static void syncImmediately(Context context) {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -109,12 +102,11 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
         BufferedReader reader = null;
 
         // Will contain the raw JSON response as a string.
-        String wifiJsonStr = null;
+        String wifiJsonStr;
 
         try {
             final String FORECAST_BASE_URL =
                     "https://data.nashville.gov/resource/4ugp-s85t.json";
-
 
             Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                     .build();
@@ -128,7 +120,7 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Read the input stream into a String
             InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder builder = new StringBuilder();
             if (inputStream == null) {
                 // Nothing to do.
                 return;
@@ -137,15 +129,17 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                buffer.append(line + "\n");
+                builder
+                        .append(line)
+                        .append("\n");
             }
 
-            if (buffer.length() == 0) {
+            if (builder.length() == 0) {
                 // Stream was empty.  No point in parsing.
                 return;
             }
-            wifiJsonStr = buffer.toString();
-            getWeatherDataFromJson(wifiJsonStr);
+            wifiJsonStr = builder.toString();
+            getLocationDataFromJson(wifiJsonStr);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
         } catch (JSONException e) {
@@ -163,17 +157,9 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
         }
-        return;
     }
 
-    /**
-     * Take the String representing the complete forecast in JSON Format and
-     * pull out the data we need to construct the Strings needed for the wireframes.
-     * <p/>
-     * Fortunately parsing is easy:  constructor takes the JSON string and converts it
-     * into an Object hierarchy for us.
-     */
-    private void getWeatherDataFromJson(String wifiJsonStr)
+    private void getLocationDataFromJson(String wifiJsonStr)
             throws JSONException {
 
         final String WIFIDATA_MAPPEDLOCTION = "mapped_location";
@@ -191,7 +177,7 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             JSONArray jArray = new JSONArray(wifiJsonStr);
 
-            Vector<ContentValues> cVVector = new Vector<ContentValues>(jArray.length());
+            Vector<ContentValues> cVVector = new Vector<>(jArray.length());
 
             for (int i = 0; i < jArray.length(); i++) {
                 String name;
@@ -234,7 +220,6 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
                 cVVector.add(wifiLocationValues);
             }
 
-            int inserted = 0;
             // add to database
             if (cVVector.size() > 0) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];

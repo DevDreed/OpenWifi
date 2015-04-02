@@ -119,7 +119,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         favNavigation.setColorPressedResId(R.color.blue_pressed);
         favNavigation.setIcon(R.drawable.ic_directions_white);
         favNavigation.setStrokeVisible(false);
-        ViewCompat.setElevation(favNavigation, 1);
+        ViewCompat.setElevation(favNavigation, 10);
 
         return rootView;
     }
