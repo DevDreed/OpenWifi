@@ -17,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.dustinmreed.openwifi.data.WifiLocationContract;
-import com.dustinmreed.openwifi.sync.OpenWiFiSyncAdapter;
 
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
@@ -122,16 +121,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         super.onActivityCreated(savedInstanceState);
     }
 
-    // since we read the location when we create the loader, all we need to do is restart things
-    void onLocationChanged() {
-        updateWiFiLocations();
-        getLoaderManager().restartLoader(WIFILOCATION_LOADER, null, this);
-    }
-
-    private void updateWiFiLocations() {
-        OpenWiFiSyncAdapter.syncImmediately(getActivity());
-    }
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         if (mPosition != ListView.INVALID_POSITION) {
@@ -142,10 +131,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        Uri weatherForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocation();
+        Uri wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocation();
 
         return new CursorLoader(getActivity(),
-                weatherForLocationUri,
+                wifiForLocationUri,
                 WIFILOCATION_COLUMNS,
                 null,
                 null,
