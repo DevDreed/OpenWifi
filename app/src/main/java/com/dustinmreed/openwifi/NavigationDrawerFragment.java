@@ -84,6 +84,23 @@ public class NavigationDrawerFragment extends Fragment {
                 super.onDrawerClosed(drawerView);
                 getActivity().invalidateOptionsMenu();
             }
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                bringDrawerToFront();
+                super.onDrawerSlide(drawerView, slideOffset);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                bringDrawerToFront();
+                super.onDrawerStateChanged(newState);
+            }
+
+            private void bringDrawerToFront() {
+                containerView.bringToFront();
+                mDrawerLayout.requestLayout();
+            }
         };
 
         if (!mUserLearnedDrawer && !mFromSavedInstanceState) {
