@@ -21,25 +21,25 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class DetailActivity extends ActionBarActivity {
+public class MapActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.activity_map);
 
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
 
             Bundle arguments = new Bundle();
-            arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
+            arguments.putParcelable(MapActivityFragment.DETAIL_URI, getIntent().getData());
 
-            DetailFragment fragment = new DetailFragment();
+            MapActivityFragment fragment = new MapActivityFragment();
             fragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.wifilocation_detail_container, fragment)
+                    .add(R.id.wifilocation_map_container, fragment)
                     .commit();
         }
     }

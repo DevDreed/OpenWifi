@@ -5,5 +5,4 @@
     android:layout_height="wrap_content"
     android:background="@color/primaryColor"
     app:popupTheme="@style/Theme.AppCompat.NoActionBar"
-    app:theme="@style/OpenWiFiThemeToolbarDarkOverflow">
-</android.support.v7.widget.Toolbar>
+    app:theme="@style/OpenWiFiThemeToolbarDarkOverflow"></android.support.v7.widget.Toolbar>

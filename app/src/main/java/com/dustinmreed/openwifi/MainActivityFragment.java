@@ -1,5 +1,6 @@
 package com.dustinmreed.openwifi;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -66,6 +67,14 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_map:
+                Intent intent = new Intent(getActivity(), MapActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                break;
+        }
         return super.onOptionsItemSelected(item);
     }
 

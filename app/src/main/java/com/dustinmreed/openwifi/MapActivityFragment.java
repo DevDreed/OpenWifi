@@ -15,8 +15,6 @@
  */
 package com.dustinmreed.openwifi;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -26,7 +24,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
@@ -37,20 +34,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.dustinmreed.openwifi.data.WifiLocationContract;
 import com.dustinmreed.openwifi.data.WifiLocationContract.WiFiLocationEntry;
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MapActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // These indices are tied to DETAIL_COLUMNS.  If DETAIL_COLUMNS changes, these
     // must change.
@@ -96,7 +97,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private Double longitude;
     private String siteName;
 
-    public DetailFragment() {
+    public MapActivityFragment() {
         setHasOptionsMenu(true);
     }
 
@@ -113,40 +114,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         ActionBarActivity activity = (ActionBarActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        mSiteNameView = (TextView) rootView.findViewById(R.id.detail_name_textview);
-        mSiteAddressView = (TextView) rootView.findViewById(R.id.detail_address_textview);
-        mSiteCityView = (TextView) rootView.findViewById(R.id.detail_city_textview);
-        mSiteStateView = (TextView) rootView.findViewById(R.id.detail_state_textview);
-        mSiteZipcodeView = (TextView) rootView.findViewById(R.id.detail_zipcode_textview);
-
-        MapsInitializer.initialize(getActivity().getApplicationContext());
-        switch (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity().getApplicationContext())) {
-            case ConnectionResult.SUCCESS:
-                Toast.makeText(getActivity(), "SUCCESS", Toast.LENGTH_SHORT).show();
-                break;
-            case ConnectionResult.SERVICE_MISSING:
-                Toast.makeText(getActivity(), "SERVICE MISSING", Toast.LENGTH_SHORT).show();
-                break;
-            case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
-                Toast.makeText(getActivity(), "UPDATE REQUIRED", Toast.LENGTH_SHORT).show();
-                break;
-            default:
-                Toast.makeText(getActivity(), GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity().getApplicationContext()), Toast.LENGTH_SHORT).show();
-        }
+        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
         // Gets the MapView from the XML layout and creates it
-        mapView = (MapView) rootView.findViewById(R.id.mapview);
-        map = mapView.getMap();
+        mapView = (MapView) rootView.findViewById(R.id.fullmapview);
         mapView.onCreate(savedInstanceState);
-
-        favNavigation = (FloatingActionButton) rootView.findViewById(R.id.route_nav_icon);
-        favNavigation.setSize(FloatingActionButton.SIZE_NORMAL);
-        favNavigation.setColorNormalResId(R.color.accentColor);
-        favNavigation.setColorPressedResId(R.color.blue_pressed);
-        favNavigation.setIcon(R.drawable.ic_directions_white);
-        favNavigation.setStrokeVisible(false);
-        ViewCompat.setElevation(favNavigation, 10);
 
         return rootView;
     }
@@ -184,12 +156,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (null != mUri) {
+        Uri wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocation();
+        if (null != wifiForLocationUri) {
+
             // Now create and return a CursorLoader that will take care of
             // creating a Cursor for the data being displayed.
             return new CursorLoader(
                     getActivity(),
-                    mUri,
+                    wifiForLocationUri,
                     DETAIL_COLUMNS,
                     null,
                     null,
@@ -201,57 +175,45 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        List<Marker> markers = new ArrayList<Marker>();
         if (data != null && data.moveToFirst()) {
+            data.moveToFirst();
+            while (!data.isAfterLast()) {
+                siteName = data.getString(COL_WIFILOCATION_NAME);
+                final String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
+                final String siteCity = data.getString(COL_WIFILOCATION_CITY);
+                String siteState = data.getString(COL_WIFILOCATION_STATE);
+                String siteZipcode = data.getString(COL_WIFILOCATION_ZIPCODE);
+                latitude = Double.valueOf(data.getString(COL_WIFILOCATION_LAT));
+                longitude = Double.valueOf(data.getString(COL_WIFILOCATION_LONG));
 
-            siteName = data.getString(COL_WIFILOCATION_NAME);
-            mSiteNameView.setText(siteName);
-            final String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
-            mSiteAddressView.setText(siteAddress);
-            final String siteCity = data.getString(COL_WIFILOCATION_CITY);
-            mSiteCityView.setText(siteCity);
-            String siteState = data.getString(COL_WIFILOCATION_STATE);
-            mSiteStateView.setText(siteState);
-            String siteZipcode = data.getString(COL_WIFILOCATION_ZIPCODE);
-            mSiteZipcodeView.setText(siteZipcode);
+                // Gets to GoogleMap from the MapView and does initialization stuff
+                map = mapView.getMap();
+                map.getUiSettings().setMyLocationButtonEnabled(false);
+                Marker marker = map.addMarker(new MarkerOptions()
+                        .position(new LatLng(latitude, longitude))
+                        .snippet(siteAddress)
+                        .title(siteName));
+                markers.add(marker);
+                data.moveToNext();
+            }
 
-            latitude = Double.valueOf(data.getString(COL_WIFILOCATION_LAT));
-            longitude = Double.valueOf(data.getString(COL_WIFILOCATION_LONG));
 
-            favNavigation.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Uri gmmIntentUri = Uri.parse("geo:" + latitude + ", " + longitude)
-                            .buildUpon()
-                            .appendQueryParameter("q", siteAddress + ", " + siteCity)
-                            .build();
-//                    Uri gmmIntentUri = Uri.parse("google.navigation:q=Taronga+Zoo,+Sydney+Australia");
-                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                    mapIntent.setPackage("com.google.android.apps.maps");
-                    startActivity(mapIntent);
-                }
-            });
             // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
             MapsInitializer.initialize(this.getActivity());
 
-            // Gets to GoogleMap from the MapView and does initialization stuff
-            map = mapView.getMap();
-            map.getUiSettings().setMyLocationButtonEnabled(false);
-            map.addMarker(new MarkerOptions()
-                    .position(new LatLng(latitude, longitude))
-                    .snippet(siteAddress)
-                    .title(siteName));
 
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (Marker marker : markers) {
+                builder.include(marker.getPosition());
+            }
+            LatLngBounds bounds = builder.build();
 
+            int padding = 100; // offset from edges of the map in pixels
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
 
-
-            // Updates the location and zoom of the MapView
-            //CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(36.05590917600006, -86.67243400799998), 20);
-            // Move the camera instantly to location with a zoom of 15.
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15));
-
-            // Zoom in, animating the camera.
-            map.animateCamera(CameraUpdateFactory.zoomTo(14));
-            //map.animateCamera(cameraUpdate);
+            map.moveCamera(cu);
+            map.animateCamera(cu);
 
             // We still need this for the share intent
             mWiFiLocation = String.format("%s", siteName);
@@ -269,7 +231,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onResume() {
-        checkGooglePlayServicesAvailable();
         mapView.onResume();
         super.onResume();
     }
@@ -289,24 +250,5 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
-    }
-
-    private void checkGooglePlayServicesAvailable() {
-        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
-        if (status != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(status)) {
-                Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, getActivity(), 0);
-                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        getActivity().finish();
-                    }
-                });
-                dialog.show();
-            } else {
-                Toast.makeText(getActivity().getApplicationContext(), "This device is not supported.", Toast.LENGTH_LONG).show();
-                getActivity().finish();
-            }
-        }
     }
 }
