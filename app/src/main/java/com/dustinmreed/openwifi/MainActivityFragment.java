@@ -35,7 +35,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     private static final String SELECTED_KEY = "selected_position";
     private static final int WIFILOCATION_LOADER = 0;
-    // For the forecast view we're showing only a small subset of the stored data.
+    // For the location view we're showing only a small subset of the stored data.
     // Specify the columns we need.
     private static final String[] WIFILOCATION_COLUMNS = {
             WifiLocationContract.WiFiLocationEntry.TABLE_NAME + "." + WifiLocationContract.WiFiLocationEntry._ID,

@@ -24,18 +24,7 @@ public class MainActivityAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         // Choose the layout type
-        int viewType = getItemViewType(cursor.getPosition());
-        int layoutId = -1;
-        switch (viewType) {
-            case VIEW_TYPE_TODAY: {
-                layoutId = R.layout.list_item_wifi_location;
-                break;
-            }
-            case VIEW_TYPE_FUTURE_DAY: {
-                layoutId = R.layout.list_item_wifi_location;
-                break;
-            }
-        }
+        int layoutId = R.layout.list_item_wifi_location;
 
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
 
@@ -50,7 +39,9 @@ public class MainActivityAdapter extends CursorAdapter {
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         String siteName = cursor.getString(MainActivityFragment.COL_WIFILOCATION_NAME);
-        viewHolder.infoView.setText(siteName);
+        String siteType = cursor.getString(MainActivityFragment.COL_WIFILOCATION_TYPE);
+        viewHolder.nameTextView.setText(siteName);
+        viewHolder.typeTextView.setText(siteType);
     }
 
     public void setUseTodayLayout(boolean useTodayLayout) {
@@ -68,11 +59,12 @@ public class MainActivityAdapter extends CursorAdapter {
     }
 
     public static class ViewHolder {
-        public final TextView infoView;
-
+        public final TextView nameTextView;
+        public final TextView typeTextView;
 
         public ViewHolder(View view) {
-            infoView = (TextView) view.findViewById(R.id.list_item_wifi_textview);
+            nameTextView = (TextView) view.findViewById(R.id.list_item_wifi_name_textview);
+            typeTextView = (TextView) view.findViewById(R.id.list_item_wifi_type_textview);
         }
     }
 }
