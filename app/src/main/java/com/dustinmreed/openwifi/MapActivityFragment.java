@@ -33,11 +33,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.dustinmreed.openwifi.data.WifiLocationContract;
 import com.dustinmreed.openwifi.data.WifiLocationContract.WiFiLocationEntry;
-import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -66,7 +64,7 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
     static final int COL_WIFILOCATION_STATE = 8;
     static final int COL_WIFILOCATION_ZIPCODE = 9;
     static final String DETAIL_URI = "URI";
-    private static final String LOG_TAG = DetailFragment.class.getSimpleName();
+    private static final String LOG_TAG = MapActivityFragment.class.getSimpleName();
     private static final String FORECAST_SHARE_HASHTAG = " #OpenWiFIApp";
     private static final int DETAIL_LOADER = 0;
     private static final String[] DETAIL_COLUMNS = {
@@ -85,16 +83,6 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
     GoogleMap map;
     private ShareActionProvider mShareActionProvider;
     private String mWiFiLocation;
-    private Uri mUri;
-    private TextView mSiteNameView;
-    private TextView mSiteAddressView;
-    private TextView mSiteCityView;
-    private TextView mSiteStateView;
-    private TextView mSiteZipcodeView;
-    private FloatingActionButton favNavigation;
-
-    private Double latitude;
-    private Double longitude;
     private String siteName;
 
     public MapActivityFragment() {
@@ -105,10 +93,6 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
-        }
 //for crate home button
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.app_bar);
         ActionBarActivity activity = (ActionBarActivity) getActivity();
@@ -184,8 +168,8 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
                 final String siteCity = data.getString(COL_WIFILOCATION_CITY);
                 String siteState = data.getString(COL_WIFILOCATION_STATE);
                 String siteZipcode = data.getString(COL_WIFILOCATION_ZIPCODE);
-                latitude = Double.valueOf(data.getString(COL_WIFILOCATION_LAT));
-                longitude = Double.valueOf(data.getString(COL_WIFILOCATION_LONG));
+                Double latitude = Double.valueOf(data.getString(COL_WIFILOCATION_LAT));
+                Double longitude = Double.valueOf(data.getString(COL_WIFILOCATION_LONG));
 
                 // Gets to GoogleMap from the MapView and does initialization stuff
                 map = mapView.getMap();
