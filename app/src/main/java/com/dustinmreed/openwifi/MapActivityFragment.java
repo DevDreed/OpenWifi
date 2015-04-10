@@ -41,6 +41,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -92,7 +93,8 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
+        MapsInitializer.initialize(this.getActivity());
 //for crate home button
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.app_bar);
         ActionBarActivity activity = (ActionBarActivity) getActivity();
@@ -164,6 +166,7 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
             data.moveToFirst();
             while (!data.isAfterLast()) {
                 siteName = data.getString(COL_WIFILOCATION_NAME);
+                String siteType = data.getString(COL_WIFILOCATION_TYPE);
                 final String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
                 final String siteCity = data.getString(COL_WIFILOCATION_CITY);
                 String siteState = data.getString(COL_WIFILOCATION_STATE);
@@ -174,18 +177,19 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
                 // Gets to GoogleMap from the MapView and does initialization stuff
                 map = mapView.getMap();
                 map.getUiSettings().setMyLocationButtonEnabled(false);
-                Marker marker = map.addMarker(new MarkerOptions()
-                        .position(new LatLng(latitude, longitude))
-                        .snippet(siteAddress)
-                        .title(siteName));
-                markers.add(marker);
+                Marker newmarker;
+
+                LatLng latlng = new LatLng(latitude, longitude);
+                if (siteType.equals("Library")) {
+                    newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                } else if (siteType.equals("Regional Community Center")) {
+                    newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                } else {
+                    newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                }
+                markers.add(newmarker);
                 data.moveToNext();
             }
-
-
-            // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
-            MapsInitializer.initialize(this.getActivity());
-
 
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (Marker marker : markers) {
