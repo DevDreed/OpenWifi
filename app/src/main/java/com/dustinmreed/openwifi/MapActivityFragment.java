@@ -180,12 +180,16 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
                 Marker newmarker;
 
                 LatLng latlng = new LatLng(latitude, longitude);
-                if (siteType.equals("Library")) {
-                    newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-                } else if (siteType.equals("Regional Community Center")) {
-                    newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
-                } else {
-                    newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                switch (siteType) {
+                    case "Library":
+                        newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        break;
+                    case "Regional Community Center":
+                        newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                        break;
+                    default:
+                        newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                        break;
                 }
                 markers.add(newmarker);
                 data.moveToNext();

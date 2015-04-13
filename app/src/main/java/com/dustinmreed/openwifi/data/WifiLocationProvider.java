@@ -23,16 +23,23 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 public class WifiLocationProvider extends ContentProvider {
-
+    public static final String LOG_TAG = WifiLocationProvider.class.getSimpleName();
     static final int WIFILOCATION = 100;
     static final int WIFILOCATION_WITH_NAME = 101;
+    static final int WIFILOCATION_WITH_TYPE = 102;
+
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private static final SQLiteQueryBuilder sWiFiLocationByNameSettingQueryBuilder;
+    private static final SQLiteQueryBuilder sWiFiLocationByTypeSettingQueryBuilder;
     private static final String sLocationSettingSelection =
             WifiLocationContract.WiFiLocationEntry.TABLE_NAME +
                     "." + WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_NAME + " = ? ";
+    private static final String sLocationTypeSelection =
+            WifiLocationContract.WiFiLocationEntry.TABLE_NAME +
+                    "." + WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_TYPE + " = ? ";
 
     static {
         sWiFiLocationByNameSettingQueryBuilder = new SQLiteQueryBuilder();
@@ -41,6 +48,12 @@ public class WifiLocationProvider extends ContentProvider {
                 WifiLocationContract.WiFiLocationEntry.TABLE_NAME);
     }
 
+    static {
+        sWiFiLocationByTypeSettingQueryBuilder = new SQLiteQueryBuilder();
+
+        sWiFiLocationByTypeSettingQueryBuilder.setTables(
+                WifiLocationContract.WiFiLocationEntry.TABLE_NAME);
+    }
     private WifiLocationDbHelper mOpenHelper;
 
     static UriMatcher buildUriMatcher() {
@@ -66,6 +79,29 @@ public class WifiLocationProvider extends ContentProvider {
 
 
         return sWiFiLocationByNameSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getWifiLocationByTypeSetting(Uri uri, String[] projection, String sortOrder) {
+        String typeSetting = WifiLocationContract.WiFiLocationEntry.getNameSettingFromUri(uri);
+        Log.d(LOG_TAG, uri.toString());
+        Log.d(LOG_TAG, typeSetting);
+        String[] selectionArgs;
+        String selection;
+
+
+        selection = sLocationTypeSelection;
+        Log.d(LOG_TAG, selection);
+        selectionArgs = new String[]{typeSetting};
+
+
+        return sWiFiLocationByTypeSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -103,6 +139,8 @@ public class WifiLocationProvider extends ContentProvider {
         // Here's the switch statement that, given a URI, will determine what kind of request it is,
         // and query the database accordingly.
         Cursor retCursor;
+        Log.d(LOG_TAG, "uri = " + uri.toString());
+        Log.d(LOG_TAG, sUriMatcher.match(uri) + "");
         switch (sUriMatcher.match(uri)) {
             case WIFILOCATION: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
@@ -116,7 +154,6 @@ public class WifiLocationProvider extends ContentProvider {
                 );
                 break;
             }
-            // "weather/*"
             case WIFILOCATION_WITH_NAME: {
                 retCursor = getWifiLocationByNameSetting(uri, projection, sortOrder);
                 break;

@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,24 +20,19 @@ import android.widget.ListView;
 
 import com.dustinmreed.openwifi.data.WifiLocationContract;
 
+import static com.dustinmreed.openwifi.Utilities.readFromPreferences;
+import static com.dustinmreed.openwifi.Utilities.saveToPreferences;
+
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
  */
 public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
-    // These indices are tied to WIFILOCATION_COLUMNS.  If WIFILOCATION_COLUMNS changes, these
-    // must change.
-    static final int _ID = 0;
     static final int COL_WIFILOCATION_NAME = 1;
     static final int COL_WIFILOCATION_TYPE = 2;
-    static final int COL_WIFILOCATION_ADDRESS = 3;
-    static final int COL_WIFILOCATION_LAT = 4;
-    static final int COL_WIFILOCATION_LONG = 5;
 
     private static final String SELECTED_KEY = "selected_position";
     private static final int WIFILOCATION_LOADER = 0;
-    // For the location view we're showing only a small subset of the stored data.
-    // Specify the columns we need.
     private static final String[] WIFILOCATION_COLUMNS = {
             WifiLocationContract.WiFiLocationEntry.TABLE_NAME + "." + WifiLocationContract.WiFiLocationEntry._ID,
             WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_NAME,
@@ -45,10 +41,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             WifiLocationContract.WiFiLocationEntry.COLUMN_COORD_LAT,
             WifiLocationContract.WiFiLocationEntry.COLUMN_COORD_LONG
     };
+    private static final String KEY_MAIN_LISTVIEW_FILTER = "main_listview_filter";
     private MainActivityAdapter mWiFiLocationAdapter;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
     private boolean mUseTodayLayout;
+    private String mMainListviewFilter;
 
     public MainActivityFragment() {
     }
@@ -56,7 +54,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
     }
 
@@ -71,6 +68,20 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             case R.id.action_map:
                 Intent intent = new Intent(getActivity(), MapActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.action_library:
+                saveToPreferences(getActivity(), KEY_MAIN_LISTVIEW_FILTER, "library");
+                mWiFiLocationAdapter.notifyDataSetChanged();
+                mListView.invalidateViews();
+                getLoaderManager().restartLoader(0, null, this);
+                mWiFiLocationAdapter.swapCursor(null);
+                return true;
+            case R.id.action_all:
+                saveToPreferences(getActivity(), KEY_MAIN_LISTVIEW_FILTER, "all");
+                mWiFiLocationAdapter.notifyDataSetChanged();
+                mListView.invalidateViews();
+                getLoaderManager().restartLoader(0, null, this);
+                mWiFiLocationAdapter.swapCursor(null);
                 return true;
             default:
                 break;
@@ -96,8 +107,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // CursorAdapter returns a cursor at the correct position for getItem(), or null
-                // if it cannot seek to that position.
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 if (cursor != null) {
                     ((Callback) getActivity())
@@ -140,8 +149,24 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        Uri wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocation();
 
+        mMainListviewFilter = readFromPreferences(getActivity(), KEY_MAIN_LISTVIEW_FILTER, "all");
+        Uri wifiForLocationUri;
+
+        Log.d(LOG_TAG, mMainListviewFilter);
+        switch (mMainListviewFilter) {
+            case "all":
+                wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocation();
+                break;
+            case "library":
+                wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocationsWithType("Library");
+                break;
+            default:
+                wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocation();
+                break;
+        }
+
+        Log.e(LOG_TAG, wifiForLocationUri.toString());
         return new CursorLoader(getActivity(),
                 wifiForLocationUri,
                 WIFILOCATION_COLUMNS,
@@ -181,6 +206,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        void onItemSelected(Uri dateUri);
+        void onItemSelected(Uri locationUri);
     }
 }

@@ -32,7 +32,6 @@ public class WifiLocationContract {
 
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_WIFILOCATION;
         public static final String TABLE_NAME = "wifilocation";
-        public static final String COLUMN_ID = "_id";
         public static final String COLUMN_SITE_NAME = "site_name";
         public static final String COLUMN_SITE_TYPE = "site_type";
         public static final String COLUMN_STREET_ADDRESS = "street_address";
@@ -47,15 +46,16 @@ public class WifiLocationContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        /*
-            Student: This is the buildWeatherLocation function you filled in.
-         */
         public static Uri buildWiFiLocation() {
             return CONTENT_URI.buildUpon().build();
         }
 
         public static Uri buildWiFiLocationWithName(String nameSetting) {
             return CONTENT_URI.buildUpon().appendPath(nameSetting).build();
+        }
+
+        public static Uri buildWiFiLocationsWithType(String types) {
+            return CONTENT_URI.buildUpon().appendPath(types).build();
         }
 
         public static String getNameSettingFromUri(Uri uri) {

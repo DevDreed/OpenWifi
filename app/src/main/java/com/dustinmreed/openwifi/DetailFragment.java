@@ -30,6 +30,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,10 +55,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     // These indices are tied to DETAIL_COLUMNS.  If DETAIL_COLUMNS changes, these
     // must change.
-    static final int COL_ID = 0;
     static final int COL_WIFILOCATION_NAME = 1;
     static final int COL_WIFILOCATION_TYPE = 2;
-    static final int COL_WIFILOCATION_STREET_ADDRESS = 3;
     static final int COL_WIFILOCATION_LAT = 4;
     static final int COL_WIFILOCATION_LONG = 5;
     static final int COL_WIFILOCATION_ADDRESS = 6;
@@ -94,7 +93,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private Double latitude;
     private Double longitude;
-    private String siteName;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -108,7 +106,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
         }
-//for crate home button
+
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.app_bar);
         ActionBarActivity activity = (ActionBarActivity) getActivity();
         activity.setSupportActionBar(toolbar);
@@ -121,19 +119,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mSiteZipcodeView = (TextView) rootView.findViewById(R.id.detail_zipcode_textview);
 
         MapsInitializer.initialize(getActivity().getApplicationContext());
-        switch (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity().getApplicationContext())) {
-            case ConnectionResult.SUCCESS:
-                Toast.makeText(getActivity(), "SUCCESS", Toast.LENGTH_SHORT).show();
-                break;
-            case ConnectionResult.SERVICE_MISSING:
-                Toast.makeText(getActivity(), "SERVICE MISSING", Toast.LENGTH_SHORT).show();
-                break;
-            case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
-                Toast.makeText(getActivity(), "UPDATE REQUIRED", Toast.LENGTH_SHORT).show();
-                break;
-            default:
-                Toast.makeText(getActivity(), GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity().getApplicationContext()), Toast.LENGTH_SHORT).show();
-        }
 
         // Gets the MapView from the XML layout and creates it
         mapView = (MapView) rootView.findViewById(R.id.mapview);
@@ -185,6 +170,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (null != mUri) {
+            Log.e(LOG_TAG, mUri.toString());
             // Now create and return a CursorLoader that will take care of
             // creating a Cursor for the data being displayed.
             return new CursorLoader(
@@ -203,7 +189,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
 
-            siteName = data.getString(COL_WIFILOCATION_NAME);
+            String siteName = data.getString(COL_WIFILOCATION_NAME);
             mSiteNameView.setText(siteName);
             final String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
             mSiteAddressView.setText(siteAddress);

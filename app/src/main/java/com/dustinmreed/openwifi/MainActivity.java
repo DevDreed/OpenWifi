@@ -12,11 +12,7 @@ import com.dustinmreed.openwifi.sync.OpenWiFiSyncAdapter;
 public class MainActivity extends ActionBarActivity implements MainActivityFragment.Callback {
 
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
-    private static final String MAPFRAGMENT_TAG = "DMAPTAG";
-    private final String LOG_TAG = MainActivity.class.getSimpleName();
     private boolean mTwoPane;
-
-    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +29,7 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
             mTwoPane = false;
         }
 
-        toolbar = (Toolbar) findViewById(R.id.app_bar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
 
         MainActivityFragment MainActivityFragment = ((MainActivityFragment) getSupportFragmentManager()
