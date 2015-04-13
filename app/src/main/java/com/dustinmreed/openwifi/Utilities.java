@@ -22,4 +22,8 @@ public class Utilities {
         return sharedPreferences.getString(preferenceName, defaultValue);
     }
 
+    public static String getFormattedAddress(String siteAddress, String siteCity, String siteState, String siteZipcode) {
+        return siteAddress + " " + siteCity + ", " + siteState + ' ' + siteZipcode;
+    }
+
 }

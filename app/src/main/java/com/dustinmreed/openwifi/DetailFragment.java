@@ -48,8 +48,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import static com.dustinmreed.openwifi.Utilities.getFormattedAddress;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -86,9 +89,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private Uri mUri;
     private TextView mSiteNameView;
     private TextView mSiteAddressView;
-    private TextView mSiteCityView;
-    private TextView mSiteStateView;
-    private TextView mSiteZipcodeView;
+    private View rootView;
     private FloatingActionButton favNavigation;
 
     private Double latitude;
@@ -105,34 +106,32 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
+            rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+            mSiteNameView = (TextView) rootView.findViewById(R.id.detail_name_textview);
+            mSiteAddressView = (TextView) rootView.findViewById(R.id.detail_address_textview);
+
+            MapsInitializer.initialize(getActivity().getApplicationContext());
+
+            // Gets the MapView from the XML layout and creates it
+            mapView = (MapView) rootView.findViewById(R.id.mapview);
+            map = mapView.getMap();
+            mapView.onCreate(savedInstanceState);
+
+            favNavigation = (FloatingActionButton) rootView.findViewById(R.id.route_nav_icon);
+            favNavigation.setSize(FloatingActionButton.SIZE_NORMAL);
+            favNavigation.setColorNormalResId(R.color.accentColor);
+            favNavigation.setColorPressedResId(R.color.accentColorPressed);
+            favNavigation.setIcon(R.drawable.ic_directions_white);
+            favNavigation.setStrokeVisible(false);
+            ViewCompat.setElevation(favNavigation, 10);
+        } else {
+            rootView = inflater.inflate(R.layout.fragment_detail_empty, container, false);
         }
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.app_bar);
         ActionBarActivity activity = (ActionBarActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-        mSiteNameView = (TextView) rootView.findViewById(R.id.detail_name_textview);
-        mSiteAddressView = (TextView) rootView.findViewById(R.id.detail_address_textview);
-        mSiteCityView = (TextView) rootView.findViewById(R.id.detail_city_textview);
-        mSiteStateView = (TextView) rootView.findViewById(R.id.detail_state_textview);
-        mSiteZipcodeView = (TextView) rootView.findViewById(R.id.detail_zipcode_textview);
-
-        MapsInitializer.initialize(getActivity().getApplicationContext());
-
-        // Gets the MapView from the XML layout and creates it
-        mapView = (MapView) rootView.findViewById(R.id.mapview);
-        map = mapView.getMap();
-        mapView.onCreate(savedInstanceState);
-
-        favNavigation = (FloatingActionButton) rootView.findViewById(R.id.route_nav_icon);
-        favNavigation.setSize(FloatingActionButton.SIZE_NORMAL);
-        favNavigation.setColorNormalResId(R.color.accentColor);
-        favNavigation.setColorPressedResId(R.color.blue_pressed);
-        favNavigation.setIcon(R.drawable.ic_directions_white);
-        favNavigation.setStrokeVisible(false);
-        ViewCompat.setElevation(favNavigation, 10);
-
         return rootView;
     }
 
@@ -191,14 +190,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             String siteName = data.getString(COL_WIFILOCATION_NAME);
             mSiteNameView.setText(siteName);
+            String siteType = data.getString(COL_WIFILOCATION_TYPE);
             final String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
-            mSiteAddressView.setText(siteAddress);
             final String siteCity = data.getString(COL_WIFILOCATION_CITY);
-            mSiteCityView.setText(siteCity);
             String siteState = data.getString(COL_WIFILOCATION_STATE);
-            mSiteStateView.setText(siteState);
             String siteZipcode = data.getString(COL_WIFILOCATION_ZIPCODE);
-            mSiteZipcodeView.setText(siteZipcode);
+            mSiteAddressView.setText(getFormattedAddress(siteAddress, siteCity, siteState, siteZipcode));
 
             latitude = Double.valueOf(data.getString(COL_WIFILOCATION_LAT));
             longitude = Double.valueOf(data.getString(COL_WIFILOCATION_LONG));
@@ -226,7 +223,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     .position(new LatLng(latitude, longitude))
                     .snippet(siteAddress)
                     .title(siteName));
-
+            LatLng latlng = new LatLng(latitude, longitude);
+            switch (siteType) {
+                case "Library":
+                    map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(getFormattedAddress(siteAddress, siteCity, siteState, siteZipcode)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    break;
+                case "Regional Community Center":
+                    map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(getFormattedAddress(siteAddress, siteCity, siteState, siteZipcode)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                    break;
+                default:
+                    map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(getFormattedAddress(siteAddress, siteCity, siteState, siteZipcode)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                    break;
+            }
 
 
 
@@ -256,7 +264,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onResume() {
         checkGooglePlayServicesAvailable();
-        mapView.onResume();
+        if (mapView != null) {
+            mapView.onResume();
+        }
         super.onResume();
     }
 
@@ -268,13 +278,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mapView.onDestroy();
+        if (mapView != null) {
+            mapView.onDestroy();
+        }
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+        if (mapView != null) {
+            mapView.onLowMemory();
+        }
     }
 
     private void checkGooglePlayServicesAvailable() {

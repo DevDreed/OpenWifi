@@ -20,4 +20,14 @@
         android:orderInCategory="50"
         android:title="@string/action_library"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_communitycenter"
+        android:orderInCategory="50"
+        android:title="@string/action_communitycenter"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_publicgathering"
+        android:orderInCategory="50"
+        android:title="@string/action_publicgathering"
+        app:showAsAction="never" />
 </menu>

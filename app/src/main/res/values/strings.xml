@@ -20,5 +20,7 @@
     <string name="action_share">Share</string>
     <string name="action_library">Library</string>
     <string name="action_all">All</string>
+    <string name="action_communitycenter">Regional Community Center</string>
+    <string name="action_publicgathering">Public Gathering</string>
 
 </resources>

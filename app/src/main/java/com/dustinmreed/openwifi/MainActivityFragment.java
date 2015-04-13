@@ -76,6 +76,20 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 getLoaderManager().restartLoader(0, null, this);
                 mWiFiLocationAdapter.swapCursor(null);
                 return true;
+            case R.id.action_communitycenter:
+                saveToPreferences(getActivity(), KEY_MAIN_LISTVIEW_FILTER, "communitycenter");
+                mWiFiLocationAdapter.notifyDataSetChanged();
+                mListView.invalidateViews();
+                getLoaderManager().restartLoader(0, null, this);
+                mWiFiLocationAdapter.swapCursor(null);
+                return true;
+            case R.id.action_publicgathering:
+                saveToPreferences(getActivity(), KEY_MAIN_LISTVIEW_FILTER, "publicgathering");
+                mWiFiLocationAdapter.notifyDataSetChanged();
+                mListView.invalidateViews();
+                getLoaderManager().restartLoader(0, null, this);
+                mWiFiLocationAdapter.swapCursor(null);
+                return true;
             case R.id.action_all:
                 saveToPreferences(getActivity(), KEY_MAIN_LISTVIEW_FILTER, "all");
                 mWiFiLocationAdapter.notifyDataSetChanged();
@@ -159,7 +173,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocation();
                 break;
             case "library":
-                wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocationsWithType("Library");
+                wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocationsWithType("type", "Library");
+                break;
+            case "communitycenter":
+                wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocationsWithType("type", "Regional Community Center");
+                break;
+            case "publicgathering":
+                wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocationsWithType("type", "Public Gathering");
                 break;
             default:
                 wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocation();

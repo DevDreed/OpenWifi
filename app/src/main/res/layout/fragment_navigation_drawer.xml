@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#EEE"
+    android:paddingTop="24dp"
     tools:context="com.dustinmreed.openwifi.NavigationDrawerFragment">
 
     <!-- TODO: Update blank fragment layout -->

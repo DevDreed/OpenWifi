@@ -15,7 +15,6 @@
  */
 package com.dustinmreed.openwifi;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,14 +22,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -49,6 +46,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.dustinmreed.openwifi.Utilities.getFormattedAddress;
 
 public class MapActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -111,27 +110,7 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.detailfragment, menu);
 
-        // Retrieve the share menu item
-        MenuItem menuItem = menu.findItem(R.id.action_share);
-
-        // Get the provider and hold onto it to set/change the share intent.
-        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
-
-        // If onLoadFinished happens before this, we can go ahead and set the share intent now.
-        if (mWiFiLocation != null) {
-            mShareActionProvider.setShareIntent(createShareForecastIntent());
-        }
-    }
-
-    private Intent createShareForecastIntent() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mWiFiLocation + FORECAST_SHARE_HASHTAG);
-        return shareIntent;
     }
 
     @Override
@@ -182,13 +161,13 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
                 LatLng latlng = new LatLng(latitude, longitude);
                 switch (siteType) {
                     case "Library":
-                        newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(getFormattedAddress(siteAddress, siteCity, siteState, siteZipcode)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                         break;
                     case "Regional Community Center":
-                        newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                        newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(getFormattedAddress(siteAddress, siteCity, siteState, siteZipcode)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                         break;
                     default:
-                        newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(siteAddress).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+                        newmarker = map.addMarker(new MarkerOptions().position(latlng).title(siteName).snippet(getFormattedAddress(siteAddress, siteCity, siteState, siteZipcode)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
                         break;
                 }
                 markers.add(newmarker);
@@ -203,17 +182,11 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
 
             int padding = 100; // offset from edges of the map in pixels
             CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-
-            map.moveCamera(cu);
-            map.animateCamera(cu);
-
-            // We still need this for the share intent
-            mWiFiLocation = String.format("%s", siteName);
-
-            // If onCreateOptionsMenu has already happened, we need to update the share intent now.
-            if (mShareActionProvider != null) {
-                mShareActionProvider.setShareIntent(createShareForecastIntent());
+            if (cu != null) {
+                map.moveCamera(cu);
+                map.animateCamera(cu);
             }
+
         }
     }
 

@@ -10,70 +10,67 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-
         <com.google.android.gms.maps.MapView
-        android:id="@+id/mapview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+            android:id="@+id/mapview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </FrameLayout>
 
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/footer"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="96dp"
         android:background="@color/white"
         android:orientation="vertical">
 
+        <LinearLayout
+            android:id="@+id/location_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="32dp">
             <TextView
                 android:id="@+id/detail_name_textview"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-condensed"
-                android:textColor="@color/black"
-                android:textSize="24sp" />
+                android:fontFamily="sans-serif-light"
+                android:textColor="#ff47515b"
+                android:textSize="@dimen/abc_text_size_body_1_material"
+                android:textStyle="bold" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/detail_address_textview"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-condensed"
-            android:textColor="@color/black"
-            android:textSize="24sp" />
+            android:layout_below="@id/location_name"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
 
-        <TextView
-            android:id="@+id/detail_city_textview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-condensed"
-            android:textColor="@color/black"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/detail_state_textview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-condensed"
-            android:textColor="@color/black"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/detail_zipcode_textview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-condensed"
-            android:textColor="@color/black"
-            android:textSize="24sp" />
-
-    </LinearLayout>
+            <TextView
+                android:id="@+id/detail_address_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-thin"
+                android:textColor="#ff4e5d44"
+                android:textSize="@dimen/abc_text_size_body_2_material"
+                android:textStyle="italic" />
+        </LinearLayout>
+    </RelativeLayout>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         android:id="@+id/route_nav_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginTop="-156dp"
-        android:elevation="5dp" />
-
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="-132dp" />
 </LinearLayout>
 

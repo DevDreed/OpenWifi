@@ -54,12 +54,20 @@ public class WifiLocationContract {
             return CONTENT_URI.buildUpon().appendPath(nameSetting).build();
         }
 
-        public static Uri buildWiFiLocationsWithType(String types) {
-            return CONTENT_URI.buildUpon().appendPath(types).build();
+        public static Uri buildWiFiLocationsWithType(String type, String location) {
+            return CONTENT_URI.buildUpon().appendPath(type).appendPath(location).build();
         }
 
         public static String getNameSettingFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
+        }
+
+        public static String getFilterFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
+        public static String getTypeFromUri(Uri uri) {
+            return uri.getPathSegments().get(2);
         }
     }
 }

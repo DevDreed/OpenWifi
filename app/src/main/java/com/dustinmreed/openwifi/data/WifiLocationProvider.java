@@ -23,6 +23,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 public class WifiLocationProvider extends ContentProvider {
@@ -34,9 +35,11 @@ public class WifiLocationProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private static final SQLiteQueryBuilder sWiFiLocationByNameSettingQueryBuilder;
     private static final SQLiteQueryBuilder sWiFiLocationByTypeSettingQueryBuilder;
+
     private static final String sLocationSettingSelection =
             WifiLocationContract.WiFiLocationEntry.TABLE_NAME +
                     "." + WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_NAME + " = ? ";
+
     private static final String sLocationTypeSelection =
             WifiLocationContract.WiFiLocationEntry.TABLE_NAME +
                     "." + WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_TYPE + " = ? ";
@@ -54,6 +57,7 @@ public class WifiLocationProvider extends ContentProvider {
         sWiFiLocationByTypeSettingQueryBuilder.setTables(
                 WifiLocationContract.WiFiLocationEntry.TABLE_NAME);
     }
+
     private WifiLocationDbHelper mOpenHelper;
 
     static UriMatcher buildUriMatcher() {
@@ -64,6 +68,7 @@ public class WifiLocationProvider extends ContentProvider {
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, WifiLocationContract.PATH_WIFILOCATION, WIFILOCATION);
         matcher.addURI(authority, WifiLocationContract.PATH_WIFILOCATION + "/*", WIFILOCATION_WITH_NAME);
+        matcher.addURI(authority, WifiLocationContract.PATH_WIFILOCATION + "/type" + "/*", WIFILOCATION_WITH_TYPE);
         return matcher;
     }
 
@@ -89,17 +94,12 @@ public class WifiLocationProvider extends ContentProvider {
     }
 
     private Cursor getWifiLocationByTypeSetting(Uri uri, String[] projection, String sortOrder) {
-        String typeSetting = WifiLocationContract.WiFiLocationEntry.getNameSettingFromUri(uri);
-        Log.d(LOG_TAG, uri.toString());
-        Log.d(LOG_TAG, typeSetting);
+        String typeSetting = WifiLocationContract.WiFiLocationEntry.getTypeFromUri(uri);
         String[] selectionArgs;
         String selection;
 
-
         selection = sLocationTypeSelection;
-        Log.d(LOG_TAG, selection);
         selectionArgs = new String[]{typeSetting};
-
 
         return sWiFiLocationByTypeSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -127,6 +127,8 @@ public class WifiLocationProvider extends ContentProvider {
             case WIFILOCATION:
                 return WifiLocationContract.WiFiLocationEntry.CONTENT_TYPE;
             case WIFILOCATION_WITH_NAME:
+                return WifiLocationContract.WiFiLocationEntry.CONTENT_TYPE;
+            case WIFILOCATION_WITH_TYPE:
                 return WifiLocationContract.WiFiLocationEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -158,8 +160,13 @@ public class WifiLocationProvider extends ContentProvider {
                 retCursor = getWifiLocationByNameSetting(uri, projection, sortOrder);
                 break;
             }
+            case WIFILOCATION_WITH_TYPE: {
+                retCursor = getWifiLocationByTypeSetting(uri, projection, sortOrder);
+                break;
+            }
             default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+                retCursor = getWifiLocationByTypeSetting(uri, projection, sortOrder);
+                //                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
@@ -234,7 +241,7 @@ public class WifiLocationProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(Uri uri, @NonNull ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
