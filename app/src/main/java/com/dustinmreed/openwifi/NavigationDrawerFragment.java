@@ -5,10 +5,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.dustinmreed.openwifi.Utilities.readFromPreferences;
 import static com.dustinmreed.openwifi.Utilities.saveToPreferences;
@@ -26,15 +31,32 @@ public class NavigationDrawerFragment extends Fragment {
 
     private DrawerLayout mDrawerLayout;
 
+    private NavigationDrawerAdapter adapter;
+
     private boolean mUserLearnedDrawer;
     private boolean mFromSavedInstanceState;
 
     private View containerView;
 
+    private RecyclerView recyclerView;
+
     public NavigationDrawerFragment() {
     }
 
+    public static List<Information> getData() {
+        List<Information> data = new ArrayList<>();
+        int[] icons = {R.drawable.ic_local_library_grey600_24dp, R.drawable.ic_local_library_grey600_24dp, R.drawable.ic_local_library_grey600_24dp, R.drawable.ic_public_grey600_24dp, R.drawable.ic_location_city_grey600_24dp};
+        String[] titles = {"Map View", "All Locations", "Library", "Regional Community Center", "Public Gathering"};
 
+        for (int i = 0; i < titles.length && i < icons.length; i++) {
+            Information current = new Information();
+            current.iconId = icons[i];
+            current.title = titles[i];
+            data.add(current);
+        }
+
+        return data;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,7 +71,14 @@ public class NavigationDrawerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+        View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+        recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
+        adapter = new NavigationDrawerAdapter(getActivity(), getData());
+        recyclerView.setAdapter(adapter);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        return layout;
     }
 
     public void setUp(int fragmentId, DrawerLayout drawerLayout, Toolbar toolbar) {

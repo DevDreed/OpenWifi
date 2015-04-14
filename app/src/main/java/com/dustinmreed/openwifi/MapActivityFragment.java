@@ -26,8 +26,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -39,6 +37,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -53,10 +52,8 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
 
     // These indices are tied to DETAIL_COLUMNS.  If DETAIL_COLUMNS changes, these
     // must change.
-    static final int COL_ID = 0;
     static final int COL_WIFILOCATION_NAME = 1;
     static final int COL_WIFILOCATION_TYPE = 2;
-    static final int COL_WIFILOCATION_STREET_ADDRESS = 3;
     static final int COL_WIFILOCATION_LAT = 4;
     static final int COL_WIFILOCATION_LONG = 5;
     static final int COL_WIFILOCATION_ADDRESS = 6;
@@ -64,7 +61,6 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
     static final int COL_WIFILOCATION_STATE = 8;
     static final int COL_WIFILOCATION_ZIPCODE = 9;
     static final String DETAIL_URI = "URI";
-    private static final String LOG_TAG = MapActivityFragment.class.getSimpleName();
     private static final String FORECAST_SHARE_HASHTAG = " #OpenWiFIApp";
     private static final int DETAIL_LOADER = 0;
     private static final String[] DETAIL_COLUMNS = {
@@ -84,6 +80,8 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
     private ShareActionProvider mShareActionProvider;
     private String mWiFiLocation;
     private String siteName;
+    private CameraUpdate cu;
+    private CameraPosition cp;
 
     public MapActivityFragment() {
         setHasOptionsMenu(true);
@@ -92,25 +90,21 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
         MapsInitializer.initialize(this.getActivity());
-//for crate home button
+
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.app_bar);
         ActionBarActivity activity = (ActionBarActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-
-        // Gets the MapView from the XML layout and creates it
         mapView = (MapView) rootView.findViewById(R.id.fullmapview);
-        mapView.onCreate(savedInstanceState);
-
+        // Gets the MapView from the XML layout and creates it
+        if (mapView != null) {
+            mapView.onCreate(savedInstanceState);
+        }
         return rootView;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
     }
 
     @Override
@@ -140,7 +134,7 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        List<Marker> markers = new ArrayList<Marker>();
+        List<Marker> markers = new ArrayList<>();
         if (data != null && data.moveToFirst()) {
             data.moveToFirst();
             while (!data.isAfterLast()) {
@@ -181,12 +175,22 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
             LatLngBounds bounds = builder.build();
 
             int padding = 100; // offset from edges of the map in pixels
-            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-            if (cu != null) {
+            cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+            try {
                 map.moveCamera(cu);
                 map.animateCamera(cu);
-            }
+            } catch (IllegalStateException ise) {
 
+                map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+
+                    @Override
+                    public void onMapLoaded() {
+                        map.moveCamera(cu);
+                        map.animateCamera(cu);
+                    }
+                });
+            }
         }
     }
 
@@ -196,13 +200,20 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onResume() {
-        mapView.onResume();
         super.onResume();
+        mapView.onResume();
+        if (cp != null) {
+            map.moveCamera(CameraUpdateFactory.newCameraPosition(cp));
+            cp = null;
+        }
     }
 
     @Override
     public void onPause() {
+        mapView.onPause();
         super.onPause();
+        cp = map.getCameraPosition();
+        map = null;
     }
 
     @Override
@@ -215,5 +226,11 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 }

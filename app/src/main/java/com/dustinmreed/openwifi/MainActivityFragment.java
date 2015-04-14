@@ -20,6 +20,7 @@ import android.widget.ListView;
 
 import com.dustinmreed.openwifi.data.WifiLocationContract;
 
+import static android.support.v4.app.ActivityCompat.invalidateOptionsMenu;
 import static com.dustinmreed.openwifi.Utilities.readFromPreferences;
 import static com.dustinmreed.openwifi.Utilities.saveToPreferences;
 
@@ -128,6 +129,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             ));
                 }
                 mPosition = position;
+                invalidateOptionsMenu(getActivity());
             }
         });
 

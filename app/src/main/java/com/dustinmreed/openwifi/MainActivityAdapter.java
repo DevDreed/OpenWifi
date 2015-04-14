@@ -6,6 +6,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivityAdapter extends CursorAdapter {
@@ -40,6 +41,18 @@ public class MainActivityAdapter extends CursorAdapter {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         String siteName = cursor.getString(MainActivityFragment.COL_WIFILOCATION_NAME);
         String siteType = cursor.getString(MainActivityFragment.COL_WIFILOCATION_TYPE);
+        switch (siteType) {
+            case "Library":
+                viewHolder.typeImageView.setImageResource(R.drawable.ic_local_library_grey600_36dp);
+                break;
+            case "Regional Community Center":
+                viewHolder.typeImageView.setImageResource(R.drawable.ic_public_grey600_36dp);
+                break;
+            case "Public Gathering":
+                viewHolder.typeImageView.setImageResource(R.drawable.ic_location_city_grey600_36dp);
+                break;
+        }
+
         viewHolder.nameTextView.setText(siteName);
         viewHolder.typeTextView.setText(siteType);
     }
@@ -59,10 +72,12 @@ public class MainActivityAdapter extends CursorAdapter {
     }
 
     public static class ViewHolder {
-        public final TextView nameTextView;
-        public final TextView typeTextView;
+        private final TextView nameTextView;
+        private final TextView typeTextView;
+        private final ImageView typeImageView;
 
         public ViewHolder(View view) {
+            typeImageView = (ImageView) view.findViewById(R.id.list_location_type);
             nameTextView = (TextView) view.findViewById(R.id.list_item_wifi_name_textview);
             typeTextView = (TextView) view.findViewById(R.id.list_item_wifi_type_textview);
         }

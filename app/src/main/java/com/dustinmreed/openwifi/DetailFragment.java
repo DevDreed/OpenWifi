@@ -52,6 +52,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import static android.support.v4.app.ActivityCompat.invalidateOptionsMenu;
 import static com.dustinmreed.openwifi.Utilities.getFormattedAddress;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -102,7 +103,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        invalidateOptionsMenu(getActivity());
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
@@ -125,6 +126,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             favNavigation.setStrokeVisible(false);
             ViewCompat.setElevation(favNavigation, 10);
         } else {
+            mWiFiLocation = null;
             rootView = inflater.inflate(R.layout.fragment_detail_empty, container, false);
         }
 
@@ -142,7 +144,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         // Retrieve the share menu item
         MenuItem menuItem = menu.findItem(R.id.action_share);
-
+        if (mWiFiLocation == null) {
+            menuItem.setVisible(false);
+        }
         // Get the provider and hold onto it to set/change the share intent.
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
 
@@ -213,16 +217,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     startActivity(mapIntent);
                 }
             });
-            // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
-            MapsInitializer.initialize(this.getActivity());
+
 
             // Gets to GoogleMap from the MapView and does initialization stuff
             map = mapView.getMap();
             map.getUiSettings().setMyLocationButtonEnabled(false);
-            map.addMarker(new MarkerOptions()
-                    .position(new LatLng(latitude, longitude))
-                    .snippet(siteAddress)
-                    .title(siteName));
+
             LatLng latlng = new LatLng(latitude, longitude);
             switch (siteType) {
                 case "Library":
