@@ -1,6 +1,5 @@
 package com.dustinmreed.openwifi;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,13 +18,8 @@ import android.widget.ListView;
 
 import com.dustinmreed.openwifi.data.WifiLocationContract;
 
-import static android.support.v4.app.ActivityCompat.invalidateOptionsMenu;
 import static com.dustinmreed.openwifi.Utilities.readFromPreferences;
-import static com.dustinmreed.openwifi.Utilities.saveToPreferences;
 
-/**
- * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
- */
 public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     static final int COL_WIFILOCATION_NAME = 1;
@@ -47,7 +40,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
     private boolean mUseTodayLayout;
-    private String mMainListviewFilter;
 
     public MainActivityFragment() {
     }
@@ -66,7 +58,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_map:
+            /*case R.id.action_map:
                 Intent intent = new Intent(getActivity(), MapActivity.class);
                 startActivity(intent);
                 return true;
@@ -97,7 +89,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 mListView.invalidateViews();
                 getLoaderManager().restartLoader(0, null, this);
                 mWiFiLocationAdapter.swapCursor(null);
-                return true;
+                return true;*/
             default:
                 break;
         }
@@ -129,7 +121,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                             ));
                 }
                 mPosition = position;
-                invalidateOptionsMenu(getActivity());
             }
         });
 
@@ -166,10 +157,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
 
-        mMainListviewFilter = readFromPreferences(getActivity(), KEY_MAIN_LISTVIEW_FILTER, "all");
+        String mMainListviewFilter = readFromPreferences(getActivity(), KEY_MAIN_LISTVIEW_FILTER, "all");
         Uri wifiForLocationUri;
 
-        Log.d(LOG_TAG, mMainListviewFilter);
         switch (mMainListviewFilter) {
             case "all":
                 wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocation();
@@ -188,7 +178,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 break;
         }
 
-        Log.e(LOG_TAG, wifiForLocationUri.toString());
         return new CursorLoader(getActivity(),
                 wifiForLocationUri,
                 WIFILOCATION_COLUMNS,

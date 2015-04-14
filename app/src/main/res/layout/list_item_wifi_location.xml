@@ -18,25 +18,27 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:orientation="vertical"
         android:paddingBottom="@dimen/listview_padding"
         android:paddingTop="@dimen/listview_padding">
-    <TextView
-        android:id="@+id/list_item_wifi_name_textview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-light"
-        android:textColor="#ff47515b"
-        android:textSize="@dimen/abc_text_size_body_1_material"
-        android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/list_item_wifi_type_textview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-thin"
-        android:textColor="#ff4e5d44"
-        android:textSize="@dimen/abc_text_size_body_2_material"
-        android:textStyle="italic" />
+        <TextView
+            android:id="@+id/list_item_wifi_name_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#ff47515b"
+            android:textSize="@dimen/abc_text_size_body_1_material"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/list_item_wifi_type_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-thin"
+            android:textColor="#ff4e5d44"
+            android:textSize="@dimen/abc_text_size_body_2_material"
+            android:textStyle="italic" />
     </LinearLayout>
 </LinearLayout>

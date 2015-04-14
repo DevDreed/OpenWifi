@@ -31,12 +31,10 @@ public class MainActivity extends ActionBarActivity implements MainActivityFragm
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
-
-        MainActivityFragment MainActivityFragment = ((MainActivityFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.fragment));
-        MainActivityFragment.setUseTodayLayout(!mTwoPane);
-
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        MainActivityFragment MainActivityFragment = ((MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment));
+        MainActivityFragment.setUseTodayLayout(!mTwoPane);
 
         NavigationDrawerFragment drawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);

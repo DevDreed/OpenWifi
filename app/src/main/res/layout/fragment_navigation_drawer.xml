@@ -3,14 +3,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#EEE"
-    android:paddingTop="@dimen/margin_top"
+    android:paddingTop="@dimen/drawer_margin_top"
     tools:context="com.dustinmreed.openwifi.NavigationDrawerFragment">
+
+    <LinearLayout
+        android:id="@+id/navDrawerHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/grey_700">
+
+        <ImageView
+            android:id="@+id/navHeaderImg"
+            android:layout_width="@dimen/nav_drawer_width"
+            android:layout_height="140dp"
+            android:src="@drawable/ic_local_library_grey600_48dp" />
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/drawerList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
+        android:layout_height="match_parent"
+        android:layout_below="@id/navDrawerHeader">
     </android.support.v7.widget.RecyclerView>
 
 </RelativeLayout>

@@ -7,6 +7,8 @@
     <dimen name="nav_drawer_width">280dp</dimen>
     <dimen name="app_bar_top_padding">0dp</dimen>
     <dimen name="listview_padding">16dp</dimen>
-    <dimen name="listview_item_height">84dp</dimen>
+    <dimen name="listview_item_height">96dp</dimen>
     <dimen name="drawer_margin_top">0dp</dimen>
+    <dimen name="margin_top">24dp</dimen>
+    <dimen name="listview_item_height_land">96dp</dimen>
 </resources>

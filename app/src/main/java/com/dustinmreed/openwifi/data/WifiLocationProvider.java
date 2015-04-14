@@ -24,7 +24,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 public class WifiLocationProvider extends ContentProvider {
     public static final String LOG_TAG = WifiLocationProvider.class.getSimpleName();
@@ -141,8 +140,6 @@ public class WifiLocationProvider extends ContentProvider {
         // Here's the switch statement that, given a URI, will determine what kind of request it is,
         // and query the database accordingly.
         Cursor retCursor;
-        Log.d(LOG_TAG, "uri = " + uri.toString());
-        Log.d(LOG_TAG, sUriMatcher.match(uri) + "");
         switch (sUriMatcher.match(uri)) {
             case WIFILOCATION: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
@@ -266,9 +263,6 @@ public class WifiLocationProvider extends ContentProvider {
         }
     }
 
-    // You do not need to call this method. This is a method specifically to assist the testing
-    // framework in running smoothly. You can read more at:
-    // http://developer.android.com/reference/android/content/ContentProvider.html#shutdown()
     @Override
     @TargetApi(11)
     public void shutdown() {

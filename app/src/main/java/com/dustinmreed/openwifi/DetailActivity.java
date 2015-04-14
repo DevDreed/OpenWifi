@@ -18,6 +18,7 @@ package com.dustinmreed.openwifi;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -42,6 +43,9 @@ public class DetailActivity extends ActionBarActivity {
                     .add(R.id.wifilocation_detail_container, fragment)
                     .commit();
         }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

@@ -27,7 +27,7 @@ public class NavigationDrawerFragment extends Fragment {
 
     public static final String KEY_USER_LEARNED_DRAWER = "user_learned_drawer";
 
-    private ActionBarDrawerToggle mDrawerToggle;
+    public ActionBarDrawerToggle mDrawerToggle;
 
     private DrawerLayout mDrawerLayout;
 
@@ -61,6 +61,7 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mUserLearnedDrawer = Boolean.valueOf(readFromPreferences(getActivity(), KEY_USER_LEARNED_DRAWER, "false"));
         if (savedInstanceState != null) {
             mFromSavedInstanceState = true;
@@ -84,7 +85,9 @@ public class NavigationDrawerFragment extends Fragment {
     public void setUp(int fragmentId, DrawerLayout drawerLayout, Toolbar toolbar) {
 
         containerView = getActivity().findViewById(fragmentId);
-
+        //TODO remove later
+        //DesignSpec designSpec = DesignSpec.fromResource(containerView, R.raw.spec);
+        //containerView.getOverlay().add(designSpec);
         mDrawerLayout = drawerLayout;
         mDrawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
 
@@ -136,5 +139,10 @@ public class NavigationDrawerFragment extends Fragment {
                 mDrawerToggle.syncState();
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        return mDrawerToggle.onOptionsItemSelected(item);
     }
 }
