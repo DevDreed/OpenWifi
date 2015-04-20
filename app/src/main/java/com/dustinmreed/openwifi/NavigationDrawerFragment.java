@@ -31,14 +31,10 @@ public class NavigationDrawerFragment extends Fragment {
 
     private DrawerLayout mDrawerLayout;
 
-    private NavigationDrawerAdapter adapter;
-
     private boolean mUserLearnedDrawer;
     private boolean mFromSavedInstanceState;
 
     private View containerView;
-
-    private RecyclerView recyclerView;
 
     public NavigationDrawerFragment() {
     }
@@ -73,8 +69,8 @@ public class NavigationDrawerFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
-        recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
-        adapter = new NavigationDrawerAdapter(getActivity(), getData());
+        RecyclerView recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
+        NavigationDrawerAdapter adapter = new NavigationDrawerAdapter(getActivity(), getData());
         recyclerView.setAdapter(adapter);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -86,8 +82,8 @@ public class NavigationDrawerFragment extends Fragment {
 
         containerView = getActivity().findViewById(fragmentId);
         //TODO remove later
-        //DesignSpec designSpec = DesignSpec.fromResource(containerView, R.raw.spec);
-        //containerView.getOverlay().add(designSpec);
+//        DesignSpec designSpec = DesignSpec.fromResource(containerView, R.raw.spec);
+//        containerView.getOverlay().add(designSpec);
         mDrawerLayout = drawerLayout;
         mDrawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
 
