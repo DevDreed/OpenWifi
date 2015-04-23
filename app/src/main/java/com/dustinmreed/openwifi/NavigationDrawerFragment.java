@@ -41,7 +41,7 @@ public class NavigationDrawerFragment extends Fragment {
 
     public static List<Information> getData() {
         List<Information> data = new ArrayList<>();
-        int[] icons = {R.drawable.ic_local_library_grey600_24dp, R.drawable.ic_local_library_grey600_24dp, R.drawable.ic_local_library_grey600_24dp, R.drawable.ic_public_grey600_24dp, R.drawable.ic_location_city_grey600_24dp};
+        int[] icons = {R.drawable.ic_action_home, R.drawable.ic_action_map, R.drawable.ic_local_library_grey600_24dp, R.drawable.ic_public_grey600_24dp, R.drawable.ic_location_city_grey600_24dp};
         String[] titles = {"Map View", "All Locations", "Library", "Regional Community Center", "Public Gathering"};
 
         for (int i = 0; i < titles.length && i < icons.length; i++) {
