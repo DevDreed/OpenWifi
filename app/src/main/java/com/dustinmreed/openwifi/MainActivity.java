@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.dustinmreed.openwifi.sync.OpenWiFiSyncAdapter;
+import com.facebook.stetho.Stetho;
 
 public class MainActivity extends AppCompatActivity implements MainActivityFragment.Callback {
 
@@ -17,6 +18,15 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(this)
+                        .enableDumpapp(
+                                Stetho.defaultDumperPluginsProvider(this))
+                        .enableWebKitInspector(
+                                Stetho.defaultInspectorModulesProvider(this))
+                        .build());
+
         setContentView(R.layout.activity_main);
         if (findViewById(R.id.wifilocation_detail_container) != null) {
             mTwoPane = true;

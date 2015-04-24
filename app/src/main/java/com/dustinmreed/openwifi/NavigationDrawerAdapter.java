@@ -14,9 +14,6 @@ import java.util.List;
 
 import static com.dustinmreed.openwifi.Utilities.saveToPreferences;
 
-/**
- * Created by Dustin on 4/13/2015.
- */
 public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDrawerAdapter.MyViewHolder> {
 
     private static final String KEY_MAIN_LISTVIEW_FILTER = "main_listview_filter";
@@ -24,6 +21,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     List<Information> data = Collections.emptyList();
     Context context;
     private LayoutInflater inflater;
+
     public NavigationDrawerAdapter(Context context, List<Information> data) {
         inflater = LayoutInflater.from(context);
         this.data = data;
@@ -33,8 +31,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = inflater.inflate(R.layout.nav_drawer_custom_row, viewGroup, false);
-        MyViewHolder holder = new MyViewHolder(view);
-        return holder;
+        return new MyViewHolder(view);
     }
 
     @Override
@@ -52,7 +49,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
         ImageView icon;
-        Intent intent;
+
         public MyViewHolder(View itemView) {
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.listText);
@@ -63,9 +60,15 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
         @Override
         public void onClick(View v) {
+            Intent intent;
             switch (getAdapterPosition()) {
                 case 0:
-                    Intent intent = new Intent(context, MapActivity.class);
+                    saveToPreferences(context, KEY_MAIN_LISTVIEW_FILTER, "all");
+                    intent = new Intent(context, MainActivity.class);
+                    context.startActivity(intent);
+                    break;
+                case 1:
+                    intent = new Intent(context, MapActivity.class);
                     context.startActivity(intent);
                     break;
                 case 2:
@@ -80,11 +83,6 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
                     break;
                 case 4:
                     saveToPreferences(context, KEY_MAIN_LISTVIEW_FILTER, "publicgathering");
-                    intent = new Intent(context, MainActivity.class);
-                    context.startActivity(intent);
-                    break;
-                case 1:
-                    saveToPreferences(context, KEY_MAIN_LISTVIEW_FILTER, "all");
                     intent = new Intent(context, MainActivity.class);
                     context.startActivity(intent);
                     break;
