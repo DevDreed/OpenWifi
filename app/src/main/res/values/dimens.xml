@@ -11,4 +11,5 @@
     <dimen name="drawer_margin_top">0dp</dimen>
     <dimen name="margin_top">24dp</dimen>
     <dimen name="listview_item_height_land">96dp</dimen>
+    <dimen name="fab_right_margin">16dp</dimen>
 </resources>

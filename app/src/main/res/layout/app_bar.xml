@@ -5,5 +5,5 @@
     android:layout_height="wrap_content"
     android:background="@color/primaryColor"
     android:paddingTop="@dimen/app_bar_top_padding"
-    app:popupTheme="@style/Theme.AppCompat.NoActionBar"
-    app:theme="@style/OpenWiFiThemeToolbarDarkOverflow" />
+    android:theme="@style/OpenWiFiThemeToolbarDarkOverflow"
+    app:popupTheme="@style/Theme.AppCompat.NoActionBar" />

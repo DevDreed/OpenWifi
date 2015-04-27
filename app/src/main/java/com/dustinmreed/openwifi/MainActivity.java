@@ -14,6 +14,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
 
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
     private boolean mTwoPane;
+    private String mTitle;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +41,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
             mTwoPane = false;
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+
+        toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 

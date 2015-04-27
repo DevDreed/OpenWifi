@@ -7,4 +7,5 @@
     <dimen name="nav_drawer_width">320dp</dimen>
     <dimen name="listview_padding">24dp</dimen>
     <dimen name="listview_item_height">96dp</dimen>
+    <dimen name="fab_right_margin">24dp</dimen>
 </resources>

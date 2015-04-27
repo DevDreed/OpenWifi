@@ -20,5 +20,6 @@
         android:layout_centerVertical="true"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="72dp"
-        android:text="Dummy Text" />
+        android:fontFamily="Roboto Medium"
+        android:textSize="14sp" />
 </RelativeLayout>

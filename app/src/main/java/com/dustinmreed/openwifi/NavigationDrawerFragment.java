@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +42,21 @@ public class NavigationDrawerFragment extends Fragment {
 
     public static List<Information> getData() {
         List<Information> data = new ArrayList<>();
-        int[] icons = {R.drawable.ic_action_home, R.drawable.ic_action_map, R.drawable.ic_local_library_grey600_24dp, R.drawable.ic_public_grey600_24dp, R.drawable.ic_location_city_grey600_24dp};
-        String[] titles = {"All Locations", "Map View", "Library", "Regional Community Center", "Public Gathering"};
+        int[] icons = {
+                R.drawable.ic_action_home,
+                R.drawable.ic_action_map,
+                R.drawable.ic_local_library_grey600_24dp,
+                R.drawable.ic_public_grey600_24dp,
+                R.drawable.ic_location_city_grey600_24dp
+        };
+
+        String[] titles = {
+                "All Locations",
+                "Map View",
+                "Libraries",
+                "Regional Community Centers",
+                "Public Gathering Locations"
+        };
 
         for (int i = 0; i < titles.length && i < icons.length; i++) {
             Information current = new Information();
@@ -69,6 +83,8 @@ public class NavigationDrawerFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+        TextView navAppName = (TextView) layout.findViewById(R.id.navAppName);
+        navAppName.setText(R.string.app_name);
         RecyclerView recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
         NavigationDrawerAdapter adapter = new NavigationDrawerAdapter(getActivity(), getData());
         recyclerView.setAdapter(adapter);

@@ -2,6 +2,7 @@ package com.dustinmreed.openwifi;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,12 +45,15 @@ public class MainActivityAdapter extends CursorAdapter {
         switch (siteType) {
             case "Library":
                 viewHolder.typeImageView.setImageResource(R.drawable.ic_local_library_grey600_36dp);
+                viewHolder.typeImageView.setColorFilter(Color.parseColor("#71B2F3"));
                 break;
             case "Regional Community Center":
                 viewHolder.typeImageView.setImageResource(R.drawable.ic_public_grey600_36dp);
+                viewHolder.typeImageView.setColorFilter(Color.parseColor("#E9A25C"));
                 break;
             case "Public Gathering":
                 viewHolder.typeImageView.setImageResource(R.drawable.ic_location_city_grey600_36dp);
+                viewHolder.typeImageView.setColorFilter(Color.parseColor("#EBEB5E"));
                 break;
         }
 

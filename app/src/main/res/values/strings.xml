@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Nashville Open Wifi</string>
+    <string name="app_name">Nashville Open WiFi</string>
     <string name="action_map">Map</string>
 
     <string name="title_activity_detail">Details</string>
@@ -22,5 +22,10 @@
     <string name="action_all">All</string>
     <string name="action_communitycenter">Regional Community Center</string>
     <string name="action_publicgathering">Public Gathering</string>
+    <string name="libraries">Libraries</string>
+    <string name="public_gatherings">Public Gathering Locations</string>
+    <string name="regional_community_centers">Regional Community Centers</string>
+    <string name="empty_fragment_location">Please Select a Location</string>
+    <string name="launcher_icon">Launcher Icon</string>
 
 </resources>
