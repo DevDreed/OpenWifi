@@ -12,7 +12,6 @@ import android.content.SyncResult;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.dustinmreed.openwifi.R;
 import com.dustinmreed.openwifi.data.WifiLocationContract;
@@ -30,12 +29,8 @@ import java.net.URL;
 import java.util.Vector;
 
 public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
-    // Interval at which to sync with the weather, in seconds.
-    // 60 seconds (1 minute) * 180 = 3 hours
-    public static final int SYNC_INTERVAL = 60 * 1440;
+    public static final int SYNC_INTERVAL = 60 * 1440; // 60 seconds (1 minute) * 180 = 3 hours
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
-
-    public final String LOG_TAG = OpenWiFiSyncAdapter.class.getSimpleName();
 
     public OpenWiFiSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -65,13 +60,9 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     public static Account getSyncAccount(Context context) {
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+        AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
 
-        // Create the account type and default account
-        Account newAccount = new Account(
-                context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+        Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
 
         if (null == accountManager.getPassword(newAccount)) {
             if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
@@ -94,35 +85,24 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        Log.d(LOG_TAG, "Starting sync");
-
-        // These two need to be declared outside the try/catch
-        // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-
-        // Will contain the raw JSON response as a string.
         String wifiJsonStr;
 
         try {
-            final String FORECAST_BASE_URL =
-                    "https://data.nashville.gov/resource/4ugp-s85t.json";
+            final String FORECAST_BASE_URL = "https://data.nashville.gov/resource/4ugp-s85t.json";
 
-            Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                    .build();
+            Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon().build();
 
             URL url = new URL(builtUri.toString());
 
-            // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
-            // Read the input stream into a String
             InputStream inputStream = urlConnection.getInputStream();
             StringBuilder builder = new StringBuilder();
             if (inputStream == null) {
-                // Nothing to do.
                 return;
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -135,15 +115,11 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             if (builder.length() == 0) {
-                // Stream was empty.  No point in parsing.
                 return;
             }
             wifiJsonStr = builder.toString();
             getLocationDataFromJson(wifiJsonStr);
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         } finally {
             if (urlConnection != null) {
@@ -153,14 +129,13 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
+                    e.printStackTrace();
                 }
             }
         }
     }
 
-    private void getLocationDataFromJson(String wifiJsonStr)
-            throws JSONException {
+    private void getLocationDataFromJson(String wifiJsonStr) throws JSONException {
 
         final String WIFIDATA_MAPPEDLOCTION = "mapped_location";
         final String WIFIDATA_LONG = "longitude";
@@ -204,9 +179,7 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
                 state = humanAddress.getString(WIFIDATA_STATE);
                 zipcode = humanAddress.getString(WIFIDATA_ZIPCODE);
 
-
                 ContentValues wifiLocationValues = new ContentValues();
-
                 wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_NAME, name);
                 wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_TYPE, type);
                 wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_STREET_ADDRESS, street_address);
@@ -220,17 +193,13 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
                 cVVector.add(wifiLocationValues);
             }
 
-            // add to database
             if (cVVector.size() > 0) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
                 getContext().getContentResolver().bulkInsert(WifiLocationContract.WiFiLocationEntry.CONTENT_URI, cvArray);
             }
 
-            Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
-
         } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
     }

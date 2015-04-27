@@ -1,6 +1,5 @@
 package com.dustinmreed.openwifi;
 
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -19,10 +18,6 @@ import java.util.List;
 import static com.dustinmreed.openwifi.Utilities.readFromPreferences;
 import static com.dustinmreed.openwifi.Utilities.saveToPreferences;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class NavigationDrawerFragment extends Fragment {
 
 
@@ -79,9 +74,8 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         TextView navAppName = (TextView) layout.findViewById(R.id.navAppName);
         navAppName.setText(R.string.app_name);
@@ -97,9 +91,6 @@ public class NavigationDrawerFragment extends Fragment {
     public void setUp(int fragmentId, DrawerLayout drawerLayout, Toolbar toolbar) {
 
         containerView = getActivity().findViewById(fragmentId);
-        //TODO remove later
-//        DesignSpec designSpec = DesignSpec.fromResource(containerView, R.raw.spec);
-//        containerView.getOverlay().add(designSpec);
         mDrawerLayout = drawerLayout;
         mDrawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
 

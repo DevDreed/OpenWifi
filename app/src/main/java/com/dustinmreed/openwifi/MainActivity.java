@@ -14,7 +14,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
 
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
     private boolean mTwoPane;
-    private String mTitle;
     private Toolbar toolbar;
 
     @Override
@@ -40,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
         } else {
             mTwoPane = false;
         }
-
 
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);

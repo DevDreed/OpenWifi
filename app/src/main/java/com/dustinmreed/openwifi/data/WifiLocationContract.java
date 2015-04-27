@@ -62,10 +62,6 @@ public class WifiLocationContract {
             return uri.getPathSegments().get(1);
         }
 
-        public static String getFilterFromUri(Uri uri) {
-            return uri.getPathSegments().get(1);
-        }
-
         public static String getTypeFromUri(Uri uri) {
             return uri.getPathSegments().get(2);
         }

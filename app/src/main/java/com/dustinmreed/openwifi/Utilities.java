@@ -3,9 +3,6 @@ package com.dustinmreed.openwifi;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-/**
- * Created by Dustin on 4/12/2015.
- */
 public class Utilities {
 
     public static final String PREF_FILE_NAME = "sharedprefs";

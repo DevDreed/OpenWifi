@@ -67,7 +67,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_WIFILOCATION_ZIPCODE = 9;
     static final String DETAIL_URI = "URI";
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-    private static final String FORECAST_SHARE_HASHTAG = " #OpenWiFIApp";
+    private static final String OPEN_WIFI_SHARE_HASHTAG = " #OpenWiFIApp";
     private static final int DETAIL_LOADER = 0;
     private static final String[] DETAIL_COLUMNS = {
             WiFiLocationEntry._ID,
@@ -88,7 +88,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private Uri mUri;
     private TextView mSiteNameView;
     private TextView mSiteAddressView;
-    private View rootView;
     private FloatingActionButton favNavigation;
 
     private Double latitude;
@@ -103,6 +102,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                              Bundle savedInstanceState) {
         invalidateOptionsMenu(getActivity());
         Bundle arguments = getArguments();
+        View rootView;
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
             rootView = inflater.inflate(R.layout.fragment_detail, container, false);
@@ -155,7 +155,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mWiFiLocation + FORECAST_SHARE_HASHTAG);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mWiFiLocation + OPEN_WIFI_SHARE_HASHTAG);
         return shareIntent;
     }
 

@@ -1,9 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyPassword 'Andr0id1'
+            storeFile file('C:/Users/RD035/Android Keystore Release/playStoreReleaseKey.jks')
+            storePassword 'Andr0id1'
+        }
+    }
     compileSdkVersion 22
     buildToolsVersion '22.0.1'
-
     defaultConfig {
         applicationId "com.dustinmreed.openwifi"
         minSdkVersion 15
@@ -13,7 +19,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

@@ -3,7 +3,6 @@ package com.dustinmreed.openwifi.sync;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
 public class OpenWiFiSyncService extends Service {
     private static final Object sSyncAdapterLock = new Object();
@@ -11,7 +10,6 @@ public class OpenWiFiSyncService extends Service {
 
     @Override
     public void onCreate() {
-        Log.d("OpenWiFiSyncService", "onCreate - OpenWiFiSyncService");
         synchronized (sSyncAdapterLock) {
             if (sOpenWiFiSyncAdapter == null) {
                 sOpenWiFiSyncAdapter = new OpenWiFiSyncAdapter(getApplicationContext(), true);
