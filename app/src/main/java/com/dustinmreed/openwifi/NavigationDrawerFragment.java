@@ -35,23 +35,18 @@ public class NavigationDrawerFragment extends Fragment {
     public NavigationDrawerFragment() {
     }
 
-    public static List<Information> getData() {
+    public List<Information> getData() {
         List<Information> data = new ArrayList<>();
         int[] icons = {
                 R.drawable.ic_action_home,
                 R.drawable.ic_action_map,
                 R.drawable.ic_local_library_grey600_24dp,
                 R.drawable.ic_public_grey600_24dp,
-                R.drawable.ic_location_city_grey600_24dp
+                R.drawable.ic_location_city_grey600_24dp,
+                R.drawable.ic_action_settings
         };
 
-        String[] titles = {
-                "All Locations",
-                "Map View",
-                "Libraries",
-                "Regional Community Centers",
-                "Public Gathering Locations"
-        };
+        String[] titles = getResources().getStringArray(R.array.nav_drawer_menu);
 
         for (int i = 0; i < titles.length && i < icons.length; i++) {
             Information current = new Information();

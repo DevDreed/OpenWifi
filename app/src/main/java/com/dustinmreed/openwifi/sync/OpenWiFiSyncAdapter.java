@@ -2,17 +2,29 @@ package com.dustinmreed.openwifi.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 
+import com.dustinmreed.openwifi.MainActivity;
 import com.dustinmreed.openwifi.R;
 import com.dustinmreed.openwifi.data.WifiLocationContract;
 
@@ -29,8 +41,13 @@ import java.net.URL;
 import java.util.Vector;
 
 public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
-    public static final int SYNC_INTERVAL = 60 * 1440; // 60 seconds (1 minute) * 180 = 3 hours
+    // Interval at which to sync with the weather, in seconds.
+    // 60 seconds (1 minute) * 180 = 3 hours
+    public static final int SYNC_INTERVAL = 60 * 1440;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
+    private static final int OPEN_WIFI_NOTIFICATION_ID = 5234;
+
+    public final String LOG_TAG = OpenWiFiSyncAdapter.class.getSimpleName();
 
     public OpenWiFiSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -60,9 +77,13 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     public static Account getSyncAccount(Context context) {
-        AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+        // Get an instance of the Android account manager
+        AccountManager accountManager =
+                (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
 
-        Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+        // Create the account type and default account
+        Account newAccount = new Account(
+                context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
 
         if (null == accountManager.getPassword(newAccount)) {
             if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
@@ -85,24 +106,35 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+        Log.d(LOG_TAG, "Starting sync");
+
+        // These two need to be declared outside the try/catch
+        // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
+
+        // Will contain the raw JSON response as a string.
         String wifiJsonStr;
 
         try {
-            final String FORECAST_BASE_URL = "https://data.nashville.gov/resource/4ugp-s85t.json";
+            final String FORECAST_BASE_URL =
+                    "https://data.nashville.gov/resource/4ugp-s85t.json";
 
-            Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon().build();
+            Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                    .build();
 
             URL url = new URL(builtUri.toString());
 
+            // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
+            // Read the input stream into a String
             InputStream inputStream = urlConnection.getInputStream();
             StringBuilder builder = new StringBuilder();
             if (inputStream == null) {
+                // Nothing to do.
                 return;
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -115,11 +147,15 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             if (builder.length() == 0) {
+                // Stream was empty.  No point in parsing.
                 return;
             }
             wifiJsonStr = builder.toString();
             getLocationDataFromJson(wifiJsonStr);
-        } catch (JSONException | IOException e) {
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error ", e);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         } finally {
             if (urlConnection != null) {
@@ -129,13 +165,14 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, "Error closing stream", e);
                 }
             }
         }
     }
 
-    private void getLocationDataFromJson(String wifiJsonStr) throws JSONException {
+    private void getLocationDataFromJson(String wifiJsonStr)
+            throws JSONException {
 
         final String WIFIDATA_MAPPEDLOCTION = "mapped_location";
         final String WIFIDATA_LONG = "longitude";
@@ -179,7 +216,9 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
                 state = humanAddress.getString(WIFIDATA_STATE);
                 zipcode = humanAddress.getString(WIFIDATA_ZIPCODE);
 
+
                 ContentValues wifiLocationValues = new ContentValues();
+
                 wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_NAME, name);
                 wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_TYPE, type);
                 wifiLocationValues.put(WifiLocationContract.WiFiLocationEntry.COLUMN_STREET_ADDRESS, street_address);
@@ -193,14 +232,70 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
                 cVVector.add(wifiLocationValues);
             }
 
+            // add to database
             if (cVVector.size() > 0) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
                 getContext().getContentResolver().bulkInsert(WifiLocationContract.WiFiLocationEntry.CONTENT_URI, cvArray);
             }
 
+            Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
+            notifyWeather();
         } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
+        }
+    }
+
+    private void notifyWeather() {
+        Context context = getContext();
+        //checking the last update and notify if it' the first of the day
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String displayNotificationsKey = context.getString(R.string.pref_enable_notifications_key);
+        boolean displayNotifications = prefs.getBoolean(displayNotificationsKey,
+                Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
+
+        if (displayNotifications) {
+
+            int iconId = R.mipmap.ic_launcher;
+            Resources resources = context.getResources();
+            Bitmap largeIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher);
+            String title = context.getString(R.string.app_name);
+
+            // Define the text of the forecast.
+            String contentText = context.getString(R.string.sync_complete);
+
+            // NotificationCompatBuilder is a very convenient way to build backward-compatible
+            // notifications.  Just throw in some data.
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(getContext())
+                            .setColor(resources.getColor(R.color.primaryColor))
+                            .setSmallIcon(iconId)
+                            .setLargeIcon(largeIcon)
+                            .setContentTitle(title)
+                            .setContentText(contentText);
+
+            // Make something interesting happen when the user clicks on the notification.
+            // In this case, opening the app is sufficient.
+            Intent resultIntent = new Intent(context, MainActivity.class);
+
+            // The stack builder object will contain an artificial back stack for the
+            // started Activity.
+            // This ensures that navigating backward from the Activity leads out of
+            // your application to the Home screen.
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(OPEN_WIFI_NOTIFICATION_ID, mBuilder.build());
+
         }
     }
 }
