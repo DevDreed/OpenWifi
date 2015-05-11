@@ -38,7 +38,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private MainActivityAdapter mWiFiLocationAdapter;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
-//    private boolean mUseTodayLayout;
 
     public MainActivityFragment() {
     }
@@ -156,6 +155,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mWiFiLocationAdapter.swapCursor(null);
+    }
+
+    public void setUseTodayLayout(boolean useTodayLayout) {
+        boolean mUseTodayLayout = useTodayLayout;
     }
 
     public interface Callback {

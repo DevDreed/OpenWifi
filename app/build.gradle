@@ -4,8 +4,9 @@ android {
     signingConfigs {
         config {
             keyPassword 'Andr0id1'
-            storeFile file('C:/Users/RD035/Android Keystore Release/playStoreReleaseKey.jks')
+            storeFile file('C:/Users/Dustin/releaseKeyStore.jks')
             storePassword 'Andr0id1'
+            keyAlias 'releaseKeyStore'
         }
     }
     compileSdkVersion 22
@@ -16,12 +17,19 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+        signingConfig signingConfigs.config
     }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
+        debug {
+            signingConfig signingConfigs.config
+        }
+    }
+    productFlavors {
     }
 }
 
