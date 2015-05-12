@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="nav_drawer_menu">
+        <item>@string/action_all</item>
+        <item>@string/title_activity_map</item>
+        <item>@string/libraries</item>
+        <item>@string/regional_community_centers</item>
+        <item>@string/public_gatherings</item>
+        <item>@string/title_activity_settings</item>
+    </string-array>
+
+</resources>

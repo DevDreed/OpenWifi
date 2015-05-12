@@ -2,18 +2,29 @@ package com.dustinmreed.openwifi.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
+import com.dustinmreed.openwifi.MainActivity;
 import com.dustinmreed.openwifi.R;
 import com.dustinmreed.openwifi.data.WifiLocationContract;
 
@@ -32,8 +43,9 @@ import java.util.Vector;
 public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
-    public static final int SYNC_INTERVAL = 60 * 1440;
+    public static final int SYNC_INTERVAL = 60 * 1440 * 3;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
+    private static final int OPEN_WIFI_NOTIFICATION_ID = 5234;
 
     public final String LOG_TAG = OpenWiFiSyncAdapter.class.getSimpleName();
 
@@ -228,10 +240,62 @@ public class OpenWiFiSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
-
+            notifyWeather();
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
+        }
+    }
+
+    private void notifyWeather() {
+        Context context = getContext();
+        //checking the last update and notify if it' the first of the day
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String displayNotificationsKey = context.getString(R.string.pref_enable_notifications_key);
+        boolean displayNotifications = prefs.getBoolean(displayNotificationsKey,
+                Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
+
+        if (displayNotifications) {
+
+            int iconId = R.mipmap.ic_launcher;
+            Resources resources = context.getResources();
+            Bitmap largeIcon = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher);
+            String title = context.getString(R.string.app_name);
+
+            // Define the text of the forecast.
+            String contentText = context.getString(R.string.sync_complete);
+
+            // NotificationCompatBuilder is a very convenient way to build backward-compatible
+            // notifications.  Just throw in some data.
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(getContext())
+                            .setColor(resources.getColor(R.color.primaryColor))
+                            .setSmallIcon(iconId)
+                            .setLargeIcon(largeIcon)
+                            .setContentTitle(title)
+                            .setContentText(contentText);
+
+            // Make something interesting happen when the user clicks on the notification.
+            // In this case, opening the app is sufficient.
+            Intent resultIntent = new Intent(context, MainActivity.class);
+
+            // The stack builder object will contain an artificial back stack for the
+            // started Activity.
+            // This ensures that navigating backward from the Activity leads out of
+            // your application to the Home screen.
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(OPEN_WIFI_NOTIFICATION_ID, mBuilder.build());
+
         }
     }
 }

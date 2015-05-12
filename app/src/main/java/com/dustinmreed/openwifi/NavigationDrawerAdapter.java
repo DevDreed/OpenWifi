@@ -18,9 +18,9 @@ import static com.dustinmreed.openwifi.Utilities.saveToPreferences;
 
 public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDrawerAdapter.MyViewHolder> {
 
+    public static final String KEY_USER_LEARNED_DRAWER = "user_learned_drawer";
     private static final String KEY_MAIN_LISTVIEW_FILTER = "main_listview_filter";
     private static final String KEY_NAV_DRAWER_HIGHLIGHT = "nav_drawer_highlight";
-
     List<Information> data = Collections.emptyList();
     Context context;
     private LayoutInflater inflater;
@@ -77,6 +77,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
         @Override
         public void onClick(View v) {
+            saveToPreferences(context, KEY_USER_LEARNED_DRAWER, "true");
             Intent intent;
             switch (getAdapterPosition()) {
                 case 0:
@@ -105,6 +106,10 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
                     saveToPreferences(context, KEY_MAIN_LISTVIEW_FILTER, "publicgathering");
                     saveToPreferences(context, KEY_NAV_DRAWER_HIGHLIGHT, String.valueOf(getAdapterPosition()));
                     intent = new Intent(context, MainActivity.class);
+                    context.startActivity(intent);
+                    break;
+                case 5:
+                    intent = new Intent(context, SettingsActivity.class);
                     context.startActivity(intent);
                     break;
                 default:
