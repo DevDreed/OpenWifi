@@ -66,7 +66,6 @@
             android:exported="false"
             android:syncable="true" />
 
-        <!-- SyncAdapter's dummy authentication service -->
         <service android:name=".sync.OpenWiFiAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -76,7 +75,6 @@
                 android:resource="@xml/authenticator" />
         </service>
 
-        <!-- The SyncAdapter service -->
         <service
             android:name=".sync.OpenWiFiSyncService"
             android:exported="true">

@@ -13,6 +13,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
+        android:contentDescription="@string/listview_icon"
         android:src="@drawable/ic_local_library_grey600_24dp" />
 
     <TextView
