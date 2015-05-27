@@ -23,4 +23,14 @@ public class Utilities {
         return siteAddress + " " + siteCity + ", " + siteState + ' ' + siteZipcode;
     }
 
+    public static String getLinkFormattedAddress(Context context, String siteAddress, String siteCity, String siteState, String siteZipcode) {
+        String mapLink = context.getString(R.string.mapsLink);
+        return mapLink + siteAddress + "+" + siteCity + ",+" + siteState + '+' + siteZipcode;
+    }
+
+    public static String replaceSpacesPlusSign(String value) {
+        value = value.replaceAll(" ", "+");
+        return value;
+    }
+
 }

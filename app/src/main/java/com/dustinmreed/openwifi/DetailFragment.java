@@ -52,6 +52,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import static android.support.v4.app.ActivityCompat.invalidateOptionsMenu;
 import static com.dustinmreed.openwifi.Utilities.getFormattedAddress;
+import static com.dustinmreed.openwifi.Utilities.getLinkFormattedAddress;
+import static com.dustinmreed.openwifi.Utilities.replaceSpacesPlusSign;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -88,11 +90,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private Uri mUri;
     private TextView mSiteNameView;
     private TextView mSiteAddressView;
-    private View rootView;
     private FloatingActionButton favNavigation;
 
     private Double latitude;
     private Double longitude;
+    private String siteName;
+    private String siteZipcode;
+    private String siteType;
+    private String siteAddress;
+    private String siteCity;
+    private String siteState;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -103,6 +110,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                              Bundle savedInstanceState) {
         invalidateOptionsMenu(getActivity());
         Bundle arguments = getArguments();
+        View rootView;
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
             rootView = inflater.inflate(R.layout.fragment_detail, container, false);
@@ -155,7 +163,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mWiFiLocation + FORECAST_SHARE_HASHTAG);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mWiFiLocation + "\n" + siteType + "\n" + replaceSpacesPlusSign(getLinkFormattedAddress(getActivity(), siteAddress, siteCity, siteState, siteZipcode)) + "\n" + FORECAST_SHARE_HASHTAG);
         return shareIntent;
     }
 
@@ -187,13 +195,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
 
-            String siteName = data.getString(COL_WIFILOCATION_NAME);
+            siteName = data.getString(COL_WIFILOCATION_NAME);
             mSiteNameView.setText(siteName);
-            String siteType = data.getString(COL_WIFILOCATION_TYPE);
-            final String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
-            final String siteCity = data.getString(COL_WIFILOCATION_CITY);
-            String siteState = data.getString(COL_WIFILOCATION_STATE);
-            String siteZipcode = data.getString(COL_WIFILOCATION_ZIPCODE);
+            siteType = data.getString(COL_WIFILOCATION_TYPE);
+            siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
+            siteCity = data.getString(COL_WIFILOCATION_CITY);
+            siteState = data.getString(COL_WIFILOCATION_STATE);
+            siteZipcode = data.getString(COL_WIFILOCATION_ZIPCODE);
             mSiteAddressView.setText(getFormattedAddress(siteAddress, siteCity, siteState, siteZipcode));
 
             latitude = Double.valueOf(data.getString(COL_WIFILOCATION_LAT));
