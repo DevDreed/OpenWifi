@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 public class WifiLocationProvider extends ContentProvider {
+    public static final String LOG_TAG = WifiLocationProvider.class.getSimpleName();
     static final int WIFILOCATION = 100;
     static final int WIFILOCATION_WITH_NAME = 101;
     static final int WIFILOCATION_WITH_TYPE = 102;
@@ -35,17 +36,18 @@ public class WifiLocationProvider extends ContentProvider {
     private static final SQLiteQueryBuilder sWiFiLocationByTypeSettingQueryBuilder;
 
     private static final String sLocationSettingSelection =
-            WifiLocationContract.WiFiLocationEntry.TABLE_NAME + "." + WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_NAME + " = ? ";
+            WifiLocationContract.WiFiLocationEntry.TABLE_NAME +
+                    "." + WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_NAME + " = ? ";
 
     private static final String sLocationTypeSelection =
-            WifiLocationContract.WiFiLocationEntry.TABLE_NAME + "." + WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_TYPE + " = ? ";
+            WifiLocationContract.WiFiLocationEntry.TABLE_NAME +
+                    "." + WifiLocationContract.WiFiLocationEntry.COLUMN_SITE_TYPE + " = ? ";
 
     static {
         sWiFiLocationByNameSettingQueryBuilder = new SQLiteQueryBuilder();
 
         sWiFiLocationByNameSettingQueryBuilder.setTables(
-                WifiLocationContract.WiFiLocationEntry.TABLE_NAME
-        );
+                WifiLocationContract.WiFiLocationEntry.TABLE_NAME);
     }
 
     static {
@@ -62,6 +64,7 @@ public class WifiLocationProvider extends ContentProvider {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = WifiLocationContract.CONTENT_AUTHORITY;
 
+        // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, WifiLocationContract.PATH_WIFILOCATION, WIFILOCATION);
         matcher.addURI(authority, WifiLocationContract.PATH_WIFILOCATION + "/*", WIFILOCATION_WITH_NAME);
         matcher.addURI(authority, WifiLocationContract.PATH_WIFILOCATION + "/type" + "/*", WIFILOCATION_WITH_TYPE);
@@ -116,6 +119,7 @@ public class WifiLocationProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
 
+        // Use the Uri Matcher to determine what kind of URI this is.
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
@@ -131,7 +135,10 @@ public class WifiLocationProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
+                        String sortOrder) {
+        // Here's the switch statement that, given a URI, will determine what kind of request it is,
+        // and query the database accordingly.
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case WIFILOCATION: {
@@ -156,11 +163,15 @@ public class WifiLocationProvider extends ContentProvider {
             }
             default:
                 retCursor = getWifiLocationByTypeSetting(uri, projection, sortOrder);
+                //                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
     }
 
+    /*
+        Student: Add the ability to insert Locations to the implementation of this function.
+     */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -188,7 +199,7 @@ public class WifiLocationProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         int rowsDeleted;
-
+        // this makes delete all rows return the number of rows deleted
         if (null == selection) selection = "1";
         switch (match) {
             case WIFILOCATION:
@@ -198,7 +209,7 @@ public class WifiLocationProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-
+        // Because a null deletes all rows
         if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }

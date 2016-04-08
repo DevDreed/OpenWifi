@@ -22,7 +22,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +50,8 @@ import static com.dustinmreed.openwifi.Utilities.getFormattedAddress;
 
 public class MapActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    // These indices are tied to DETAIL_COLUMNS.  If DETAIL_COLUMNS changes, these
+    // must change.
     static final int COL_WIFILOCATION_NAME = 1;
     static final int COL_WIFILOCATION_TYPE = 2;
     static final int COL_WIFILOCATION_LAT = 4;
@@ -58,6 +61,7 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
     static final int COL_WIFILOCATION_STATE = 8;
     static final int COL_WIFILOCATION_ZIPCODE = 9;
     static final String DETAIL_URI = "URI";
+    private static final String FORECAST_SHARE_HASHTAG = " #OpenWiFIApp";
     private static final int DETAIL_LOADER = 0;
     private static final String[] DETAIL_COLUMNS = {
             WiFiLocationEntry._ID,
@@ -71,9 +75,11 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
             WiFiLocationEntry.COLUMN_STATE,
             WiFiLocationEntry.COLUMN_ZIPCODE,
     };
-
     MapView mapView;
     GoogleMap map;
+    private ShareActionProvider mShareActionProvider;
+    private String mWiFiLocation;
+    private String siteName;
     private CameraUpdate cu;
     private CameraPosition cp;
 
@@ -82,17 +88,19 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
+        // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
         MapsInitializer.initialize(this.getActivity());
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.app_bar);
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        ActionBarActivity activity = (ActionBarActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
         mapView = (MapView) rootView.findViewById(R.id.fullmapview);
+        // Gets the MapView from the XML layout and creates it
         if (mapView != null) {
             mapView.onCreate(savedInstanceState);
         }
@@ -109,6 +117,9 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri wifiForLocationUri = WifiLocationContract.WiFiLocationEntry.buildWiFiLocation();
         if (null != wifiForLocationUri) {
+
+            // Now create and return a CursorLoader that will take care of
+            // creating a Cursor for the data being displayed.
             return new CursorLoader(
                     getActivity(),
                     wifiForLocationUri,
@@ -127,15 +138,16 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
         if (data != null && data.moveToFirst()) {
             data.moveToFirst();
             while (!data.isAfterLast()) {
-                String siteName = data.getString(COL_WIFILOCATION_NAME);
+                siteName = data.getString(COL_WIFILOCATION_NAME);
                 String siteType = data.getString(COL_WIFILOCATION_TYPE);
-                String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
-                String siteCity = data.getString(COL_WIFILOCATION_CITY);
+                final String siteAddress = data.getString(COL_WIFILOCATION_ADDRESS);
+                final String siteCity = data.getString(COL_WIFILOCATION_CITY);
                 String siteState = data.getString(COL_WIFILOCATION_STATE);
                 String siteZipcode = data.getString(COL_WIFILOCATION_ZIPCODE);
                 Double latitude = Double.valueOf(data.getString(COL_WIFILOCATION_LAT));
                 Double longitude = Double.valueOf(data.getString(COL_WIFILOCATION_LONG));
 
+                // Gets to GoogleMap from the MapView and does initialization stuff
                 map = mapView.getMap();
                 map.getUiSettings().setMyLocationButtonEnabled(false);
                 Marker newmarker;
@@ -162,7 +174,7 @@ public class MapActivityFragment extends Fragment implements LoaderManager.Loade
             }
             LatLngBounds bounds = builder.build();
 
-            int padding = 100;
+            int padding = 100; // offset from edges of the map in pixels
             cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
 
             try {

@@ -10,6 +10,7 @@
         android:id="@+id/list_location_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/listview_icon"
         android:paddingEnd="@dimen/listview_padding"
         android:paddingLeft="@dimen/listview_padding"
         android:paddingRight="@dimen/listview_padding"
