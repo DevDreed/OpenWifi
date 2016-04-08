@@ -3,9 +3,6 @@ package com.dustinmreed.openwifi;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-/**
- * Created by Dustin on 4/12/2015.
- */
 public class Utilities {
 
     public static final String PREF_FILE_NAME = "sharedprefs";
@@ -24,6 +21,16 @@ public class Utilities {
 
     public static String getFormattedAddress(String siteAddress, String siteCity, String siteState, String siteZipcode) {
         return siteAddress + " " + siteCity + ", " + siteState + ' ' + siteZipcode;
+    }
+
+    public static String getLinkFormattedAddress(Context context, String siteAddress, String siteCity, String siteState, String siteZipcode) {
+        String mapLink = context.getString(R.string.mapsLink);
+        return mapLink + siteAddress + "+" + siteCity + ",+" + siteState + '+' + siteZipcode;
+    }
+
+    public static String replaceSpacesPlusSign(String value) {
+        value = value.replaceAll(" ", "+");
+        return value;
     }
 
 }
